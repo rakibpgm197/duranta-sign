@@ -1,1756 +1,1137 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>দুরন্ত ডিজিটাল সাইন | পাটগ্রাম</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪧</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --gold: #D4AF37;
-            --gold2: #F5D06A;
-            --gold3: #A0830A;
-            --dark: #0A0A0F;
-            --dark2: #111118;
-            --dark3: #1A1A28;
-            --card: #16161F;
-            --text: #F0EEE8;
-            --text-muted: #9090A8;
-            --accent: #6C63FF;
-            --accent2: #FF6584;
-            --green: #00C896;
-        }
-
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html { scroll-behavior:smooth; }
-
-        body {
-            font-family:'Hind Siliguri', sans-serif;
-            background:var(--dark);
-            color:var(--text);
-            overflow-x:hidden;
-        }
-
-        /* ===== SCROLLBAR ===== */
-        ::-webkit-scrollbar { width:5px; }
-        ::-webkit-scrollbar-track { background:var(--dark); }
-        ::-webkit-scrollbar-thumb { background:var(--gold3); border-radius:3px; }
-
-        /* ===== LOADER ===== */
-        .loader {
-            position:fixed; inset:0;
-            background:var(--dark);
-            display:flex; align-items:center; justify-content:center;
-            z-index:9999;
-            transition:opacity 0.6s ease, visibility 0.6s;
-        }
-        .loader.hide { opacity:0; visibility:hidden; }
-        .loader-inner {
-            text-align:center;
-        }
-        .loader-logo {
-            font-size:3rem;
-            animation:pulse 1s ease-in-out infinite;
-        }
-        .loader-text {
-            font-size:1rem;
-            color:var(--gold);
-            margin-top:15px;
-            letter-spacing:3px;
-            text-transform:uppercase;
-        }
-        .loader-bar {
-            width:200px; height:2px;
-            background:var(--dark3);
-            border-radius:2px;
-            margin:15px auto 0;
-            overflow:hidden;
-        }
-        .loader-fill {
-            height:100%;
-            background:linear-gradient(90deg, var(--gold3), var(--gold), var(--gold2));
-            border-radius:2px;
-            animation:loadFill 1.5s ease forwards;
-        }
-        @keyframes loadFill { from{width:0} to{width:100%} }
-        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-
-        /* ===== PARTICLES ===== */
-        #particles { position:fixed; inset:0; z-index:0; pointer-events:none; }
-
-        /* ===== NAVBAR ===== */
-        .navbar {
-            position:fixed; top:0; left:0; right:0;
-            z-index:100;
-            padding:15px 40px;
-            display:flex; align-items:center; justify-content:space-between;
-            transition:all 0.4s ease;
-        }
-        .navbar.scrolled {
-            background:rgba(10,10,15,0.95);
-            backdrop-filter:blur(20px);
-            border-bottom:1px solid rgba(212,175,55,0.15);
-            padding:12px 40px;
-        }
-        .nav-logo {
-            display:flex; align-items:center; gap:12px;
-            text-decoration:none;
-        }
-        .nav-logo-icon {
-            width:45px; height:45px;
-            background:linear-gradient(135deg, var(--gold3), var(--gold));
-            border-radius:12px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.3rem;
-            box-shadow:0 4px 15px rgba(212,175,55,0.3);
-        }
-        .nav-logo-text h2 {
-            font-size:1rem; font-weight:700; color:var(--gold);
-            line-height:1.2;
-        }
-        .nav-logo-text p { font-size:0.68rem; color:var(--text-muted); }
-
-        .nav-links {
-            display:flex; align-items:center; gap:30px;
-            list-style:none;
-        }
-        .nav-links a {
-            color:var(--text-muted); text-decoration:none;
-            font-size:0.88rem; font-weight:500;
-            transition:color 0.3s;
-            position:relative;
-        }
-        .nav-links a::after {
-            content:'';
-            position:absolute; bottom:-3px; left:0;
-            width:0; height:1px;
-            background:var(--gold);
-            transition:width 0.3s;
-        }
-        .nav-links a:hover { color:var(--gold); }
-        .nav-links a:hover::after { width:100%; }
-
-        .nav-cta {
-            background:linear-gradient(135deg, var(--gold3), var(--gold));
-            color:var(--dark) !important;
-            padding:9px 20px;
-            border-radius:25px;
-            font-weight:700 !important;
-            font-size:0.85rem !important;
-            transition:all 0.3s !important;
-            box-shadow:0 4px 15px rgba(212,175,55,0.3);
-        }
-        .nav-cta:hover {
-            transform:translateY(-2px);
-            box-shadow:0 8px 25px rgba(212,175,55,0.4) !important;
-        }
-        .nav-cta::after { display:none !important; }
-
-        .hamburger {
-            display:none;
-            flex-direction:column; gap:5px;
-            cursor:pointer; padding:5px;
-        }
-        .hamburger span {
-            width:25px; height:2px;
-            background:var(--gold);
-            border-radius:2px;
-            transition:all 0.3s;
-        }
-
-        .mobile-menu {
-            display:none;
-            position:fixed; top:0; right:0;
-            width:280px; height:100vh;
-            background:var(--dark2);
-            border-left:1px solid rgba(212,175,55,0.1);
-            z-index:200;
-            padding:80px 30px 30px;
-            transform:translateX(100%);
-            transition:transform 0.3s ease;
-        }
-        .mobile-menu.open { transform:translateX(0); }
-        .mobile-menu a {
-            display:block; color:var(--text-muted);
-            text-decoration:none; font-size:1rem;
-            padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05);
-            transition:color 0.3s;
-        }
-        .mobile-menu a:hover { color:var(--gold); }
-        .menu-overlay {
-            display:none; position:fixed; inset:0;
-            background:rgba(0,0,0,0.7); z-index:150;
-        }
-        .menu-overlay.open { display:block; }
-
-        /* ===== HERO ===== */
-        .hero {
-            min-height:100vh;
-            display:flex; align-items:center; justify-content:center;
-            position:relative;
-            overflow:hidden;
-            text-align:center;
-            padding:100px 20px 60px;
-        }
-
-        .hero-bg {
-            position:absolute; inset:0;
-            background:
-                radial-gradient(ellipse at 20% 50%, rgba(212,175,55,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(108,99,255,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 60% 80%, rgba(255,101,132,0.05) 0%, transparent 50%);
-        }
-
-        .hero-grid {
-            position:absolute; inset:0; opacity:0.03;
-            background-image:
-                linear-gradient(var(--gold) 1px, transparent 1px),
-                linear-gradient(90deg, var(--gold) 1px, transparent 1px);
-            background-size:60px 60px;
-        }
-
-        .hero-content { position:relative; z-index:1; max-width:850px; }
-
-        .hero-badge {
-            display:inline-flex; align-items:center; gap:8px;
-            background:rgba(212,175,55,0.1);
-            border:1px solid rgba(212,175,55,0.25);
-            border-radius:25px;
-            padding:8px 20px;
-            font-size:0.82rem;
-            color:var(--gold);
-            margin-bottom:30px;
-            animation:fadeDown 0.8s ease both;
-        }
-        .hero-badge .dot {
-            width:8px; height:8px; border-radius:50%;
-            background:var(--green);
-            animation:blink 1.5s ease-in-out infinite;
-        }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-        .hero-greeting {
-            font-size:0.95rem;
-            color:var(--text-muted);
-            margin-bottom:15px;
-            animation:fadeDown 0.9s ease both 0.1s;
-        }
-
-        .hero-title {
-            font-family:'Playfair Display', serif;
-            font-size:clamp(2.5rem, 6vw, 4.5rem);
-            font-weight:900;
-            line-height:1.15;
-            margin-bottom:15px;
-            animation:fadeDown 1s ease both 0.2s;
-        }
-
-        .hero-title .gold {
-            background:linear-gradient(135deg, var(--gold3), var(--gold), var(--gold2));
-            -webkit-background-clip:text;
-            -webkit-text-fill-color:transparent;
-            background-clip:text;
-        }
-
-        .hero-subtitle {
-            font-size:clamp(1rem, 2.5vw, 1.4rem);
-            color:var(--text-muted);
-            margin-bottom:10px;
-            animation:fadeDown 1s ease both 0.3s;
-        }
-
-        .hero-tagline {
-            font-size:1.1rem;
-            color:var(--gold);
-            font-weight:600;
-            margin-bottom:35px;
-            animation:fadeDown 1s ease both 0.4s;
-        }
-
-        .hero-btns {
-            display:flex; gap:15px; justify-content:center; flex-wrap:wrap;
-            animation:fadeDown 1s ease both 0.5s;
-        }
-
-        .btn-gold {
-            background:linear-gradient(135deg, var(--gold3), var(--gold));
-            color:var(--dark);
-            border:none;
-            border-radius:50px;
-            padding:15px 35px;
-            font-family:'Hind Siliguri', sans-serif;
-            font-size:1rem;
-            font-weight:700;
-            cursor:pointer;
-            transition:all 0.3s;
-            text-decoration:none;
-            display:inline-flex; align-items:center; gap:8px;
-            box-shadow:0 8px 25px rgba(212,175,55,0.35);
-        }
-        .btn-gold:hover {
-            transform:translateY(-3px);
-            box-shadow:0 15px 35px rgba(212,175,55,0.45);
-        }
-
-        .btn-outline {
-            background:transparent;
-            color:var(--text);
-            border:1px solid rgba(255,255,255,0.2);
-            border-radius:50px;
-            padding:15px 35px;
-            font-family:'Hind Siliguri', sans-serif;
-            font-size:1rem;
-            font-weight:600;
-            cursor:pointer;
-            transition:all 0.3s;
-            text-decoration:none;
-            display:inline-flex; align-items:center; gap:8px;
-        }
-        .btn-outline:hover {
-            border-color:var(--gold);
-            color:var(--gold);
-            transform:translateY(-3px);
-        }
-
-        .hero-scroll {
-            position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
-            display:flex; flex-direction:column; align-items:center; gap:8px;
-            animation:fadeUp 1s ease both 0.8s;
-            cursor:pointer;
-        }
-        .hero-scroll span { font-size:0.72rem; color:var(--text-muted); letter-spacing:2px; text-transform:uppercase; }
-        .scroll-line {
-            width:1px; height:50px;
-            background:linear-gradient(to bottom, var(--gold), transparent);
-            animation:scrollAnim 1.5s ease-in-out infinite;
-        }
-        @keyframes scrollAnim { 0%{height:0;opacity:1} 100%{height:50px;opacity:0} }
-
-        @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-
-        /* ===== FLOATING STATS ===== */
-        .hero-stats {
-            display:flex; justify-content:center; gap:40px;
-            margin-top:50px;
-            animation:fadeDown 1s ease both 0.6s;
-            flex-wrap:wrap;
-        }
-        .stat-item { text-align:center; }
-        .stat-num {
-            font-family:'Playfair Display', serif;
-            font-size:2rem; font-weight:700;
-            color:var(--gold);
-            display:block;
-        }
-        .stat-label { font-size:0.78rem; color:var(--text-muted); }
-        .stat-divider { width:1px; background:rgba(255,255,255,0.1); }
-
-        /* ===== MARQUEE ===== */
-        .marquee-section {
-            background:linear-gradient(135deg, var(--gold3), var(--gold));
-            padding:14px 0;
-            overflow:hidden;
-            position:relative; z-index:1;
-        }
-        .marquee-track {
-            display:flex; gap:0;
-            animation:marquee 20s linear infinite;
-            white-space:nowrap;
-        }
-        .marquee-item {
-            display:inline-flex; align-items:center; gap:15px;
-            padding:0 30px;
-            font-size:0.88rem; font-weight:700;
-            color:var(--dark);
-        }
-        .marquee-dot { width:6px; height:6px; border-radius:50%; background:var(--dark); opacity:0.4; }
-        @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-
-        /* ===== SECTION COMMON ===== */
-        section { position:relative; z-index:1; }
-
-        .section-pad { padding:100px 40px; }
-        .container { max-width:1200px; margin:0 auto; }
-
-        .section-badge {
-            display:inline-block;
-            background:rgba(212,175,55,0.1);
-            border:1px solid rgba(212,175,55,0.2);
-            color:var(--gold);
-            font-size:0.75rem;
-            font-weight:700;
-            letter-spacing:2px;
-            text-transform:uppercase;
-            padding:6px 18px;
-            border-radius:20px;
-            margin-bottom:15px;
-        }
-
-        .section-title {
-            font-family:'Playfair Display', serif;
-            font-size:clamp(1.8rem, 4vw, 2.8rem);
-            font-weight:700;
-            line-height:1.3;
-            margin-bottom:15px;
-        }
-
-        .section-title .gold {
-            background:linear-gradient(135deg, var(--gold3), var(--gold2));
-            -webkit-background-clip:text;
-            -webkit-text-fill-color:transparent;
-            background-clip:text;
-        }
-
-        .section-sub {
-            font-size:1rem;
-            color:var(--text-muted);
-            max-width:550px;
-            line-height:1.7;
-        }
-
-        /* ===== SERVICES ===== */
-        .services-section {
-            background:var(--dark2);
-        }
-
-        .services-header { text-align:center; margin-bottom:60px; }
-        .services-header .section-sub { margin:0 auto; }
-
-        .services-grid {
-            display:grid;
-            grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
-            gap:25px;
-        }
-
-        .service-card {
-            background:var(--card);
-            border:1px solid rgba(255,255,255,0.06);
-            border-radius:20px;
-            padding:30px;
-            transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
-            position:relative;
-            overflow:hidden;
-            cursor:pointer;
-        }
-
-        .service-card::before {
-            content:'';
-            position:absolute; inset:0;
-            background:linear-gradient(135deg, rgba(212,175,55,0.05), transparent);
-            opacity:0;
-            transition:opacity 0.4s;
-        }
-
-        .service-card:hover { transform:translateY(-8px); border-color:rgba(212,175,55,0.25); box-shadow:0 20px 50px rgba(0,0,0,0.4); }
-        .service-card:hover::before { opacity:1; }
-
-        .service-icon {
-            width:60px; height:60px;
-            border-radius:16px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.8rem;
-            margin-bottom:20px;
-            background:rgba(212,175,55,0.1);
-            border:1px solid rgba(212,175,55,0.15);
-            transition:all 0.4s;
-        }
-
-        .service-card:hover .service-icon {
-            background:linear-gradient(135deg, var(--gold3), var(--gold));
-            transform:scale(1.1) rotate(5deg);
-        }
-
-        .service-name {
-            font-size:1.1rem;
-            font-weight:700;
-            margin-bottom:10px;
-            color:var(--text);
-        }
-
-        .service-desc {
-            font-size:0.85rem;
-            color:var(--text-muted);
-            line-height:1.7;
-        }
-
-        .service-tag {
-            display:inline-block;
-            margin-top:15px;
-            background:rgba(212,175,55,0.08);
-            color:var(--gold);
-            font-size:0.7rem;
-            font-weight:700;
-            padding:4px 12px;
-            border-radius:20px;
-            letter-spacing:1px;
-        }
-
-        /* ===== WHY US ===== */
-        .why-section { background:var(--dark); }
-
-        .why-grid {
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:70px;
-            align-items:center;
-        }
-
-        .why-image-wrap { position:relative; }
-
-        .why-image {
-            width:100%;
-            border-radius:25px;
-            overflow:hidden;
-            position:relative;
-        }
-
-        .why-image img {
-            width:100%; height:450px;
-            object-fit:cover;
-            display:block;
-        }
-
-        .why-image-overlay {
-            position:absolute; inset:0;
-            background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(108,99,255,0.1));
-            border-radius:25px;
-        }
-
-        .why-float-card {
-            position:absolute;
-            background:var(--card);
-            border:1px solid rgba(212,175,55,0.2);
-            border-radius:15px;
-            padding:15px 20px;
-            backdrop-filter:blur(10px);
-        }
-
-        .why-float-card.card1 { bottom:-20px; left:-20px; }
-        .why-float-card.card2 { top:-20px; right:-20px; }
-
-        .float-num {
-            font-family:'Playfair Display', serif;
-            font-size:1.8rem; font-weight:700;
-            color:var(--gold);
-        }
-        .float-label { font-size:0.75rem; color:var(--text-muted); }
-
-        .why-features { display:flex; flex-direction:column; gap:25px; margin-top:35px; }
-
-        .why-feature {
-            display:flex; gap:18px;
-            padding:20px;
-            background:var(--card);
-            border:1px solid rgba(255,255,255,0.05);
-            border-radius:15px;
-            transition:all 0.3s;
-        }
-
-        .why-feature:hover { border-color:rgba(212,175,55,0.2); transform:translateX(5px); }
-
-        .why-feature-icon {
-            width:45px; height:45px; flex-shrink:0;
-            background:rgba(212,175,55,0.1);
-            border-radius:12px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.2rem;
-        }
-
-        .why-feature-text h4 { font-size:0.95rem; font-weight:700; margin-bottom:5px; }
-        .why-feature-text p { font-size:0.82rem; color:var(--text-muted); line-height:1.6; }
-
-        /* ===== GALLERY ===== */
-        .gallery-section { background:var(--dark2); }
-        .gallery-header { text-align:center; margin-bottom:50px; }
-
-        .gallery-grid {
-            display:grid;
-            grid-template-columns:repeat(4, 1fr);
-            grid-template-rows:auto;
-            gap:15px;
-        }
-
-        .gallery-item {
-            border-radius:15px;
-            overflow:hidden;
-            position:relative;
-            cursor:pointer;
-        }
-
-        .gallery-item.big { grid-column:span 2; grid-row:span 2; }
-
-        .gallery-item img {
-            width:100%; height:200px;
-            object-fit:cover;
-            transition:transform 0.5s ease;
-            display:block;
-        }
-
-        .gallery-item.big img { height:415px; }
-
-        .gallery-item:hover img { transform:scale(1.08); }
-
-        .gallery-overlay {
-            position:absolute; inset:0;
-            background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-            opacity:0;
-            transition:opacity 0.3s;
-            display:flex; align-items:flex-end;
-            padding:20px;
-        }
-
-        .gallery-item:hover .gallery-overlay { opacity:1; }
-        .gallery-overlay span { color:white; font-weight:600; font-size:0.9rem; }
-
-        /* ===== PROCESS ===== */
-        .process-section { background:var(--dark); }
-        .process-header { text-align:center; margin-bottom:60px; }
-
-        .process-steps {
-            display:grid;
-            grid-template-columns:repeat(4,1fr);
-            gap:30px;
-            position:relative;
-        }
-
-        .process-steps::before {
-            content:'';
-            position:absolute;
-            top:40px; left:12%; right:12%;
-            height:1px;
-            background:linear-gradient(90deg, transparent, var(--gold), var(--gold), transparent);
-            opacity:0.3;
-        }
-
-        .process-step { text-align:center; position:relative; }
-
-        .step-num {
-            width:80px; height:80px;
-            border-radius:50%;
-            background:var(--card);
-            border:2px solid rgba(212,175,55,0.3);
-            display:flex; align-items:center; justify-content:center;
-            margin:0 auto 20px;
-            font-family:'Playfair Display', serif;
-            font-size:1.5rem; font-weight:700;
-            color:var(--gold);
-            transition:all 0.4s;
-            position:relative; z-index:1;
-        }
-
-        .process-step:hover .step-num {
-            background:linear-gradient(135deg, var(--gold3), var(--gold));
-            color:var(--dark);
-            border-color:var(--gold);
-            transform:scale(1.1);
-            box-shadow:0 10px 30px rgba(212,175,55,0.4);
-        }
-
-        .step-title { font-size:0.95rem; font-weight:700; margin-bottom:10px; }
-        .step-desc { font-size:0.82rem; color:var(--text-muted); line-height:1.6; }
-
-        /* ===== TESTIMONIALS ===== */
-        .testimonial-section { background:var(--dark2); }
-        .testimonial-header { text-align:center; margin-bottom:50px; }
-
-        .testimonial-grid {
-            display:grid;
-            grid-template-columns:repeat(3,1fr);
-            gap:25px;
-        }
-
-        .testimonial-card {
-            background:var(--card);
-            border:1px solid rgba(255,255,255,0.06);
-            border-radius:20px;
-            padding:30px;
-            transition:all 0.3s;
-            position:relative;
-        }
-
-        .testimonial-card:hover { transform:translateY(-5px); border-color:rgba(212,175,55,0.2); }
-
-        .testimonial-quote {
-            font-size:3rem;
-            color:var(--gold);
-            opacity:0.3;
-            line-height:1;
-            margin-bottom:15px;
-            font-family:'Playfair Display', serif;
-        }
-
-        .testimonial-text {
-            font-size:0.88rem;
-            color:var(--text-muted);
-            line-height:1.8;
-            margin-bottom:20px;
-            font-style:italic;
-        }
-
-        .testimonial-author {
-            display:flex; align-items:center; gap:12px;
-        }
-
-        .author-avatar {
-            width:42px; height:42px; border-radius:50%;
-            background:linear-gradient(135deg, var(--gold3), var(--gold));
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.1rem; font-weight:700; color:var(--dark);
-            flex-shrink:0;
-        }
-
-        .author-name { font-size:0.88rem; font-weight:700; }
-        .author-role { font-size:0.74rem; color:var(--text-muted); }
-
-        .stars { color:var(--gold); font-size:0.8rem; margin-bottom:15px; }
-
-        /* ===== CTA ===== */
-        .cta-section {
-            background:linear-gradient(135deg, var(--dark2), var(--dark3));
-            position:relative; overflow:hidden;
-        }
-
-        .cta-section::before {
-            content:'';
-            position:absolute; inset:0;
-            background:
-                radial-gradient(ellipse at 30% 50%, rgba(212,175,55,0.08), transparent 60%),
-                radial-gradient(ellipse at 70% 50%, rgba(108,99,255,0.06), transparent 60%);
-        }
-
-        .cta-content { text-align:center; position:relative; z-index:1; }
-        .cta-content .section-title { font-size:clamp(1.8rem, 4vw, 3rem); }
-
-        /* ===== CONTACT ===== */
-        .contact-section { background:var(--dark); }
-
-        .contact-grid {
-            display:grid;
-            grid-template-columns:1fr 1.5fr;
-            gap:60px;
-            align-items:start;
-        }
-
-        .contact-info h3 {
-            font-family:'Playfair Display', serif;
-            font-size:1.8rem; font-weight:700;
-            margin-bottom:20px;
-        }
-
-        .contact-info p {
-            color:var(--text-muted);
-            font-size:0.9rem;
-            line-height:1.8;
-            margin-bottom:30px;
-        }
-
-        .contact-items { display:flex; flex-direction:column; gap:18px; }
-
-        .contact-item {
-            display:flex; gap:15px; align-items:center;
-            padding:16px 20px;
-            background:var(--card);
-            border:1px solid rgba(255,255,255,0.05);
-            border-radius:14px;
-            transition:all 0.3s;
-        }
-
-        .contact-item:hover { border-color:rgba(212,175,55,0.2); transform:translateX(5px); }
-
-        .contact-item-icon {
-            width:42px; height:42px; flex-shrink:0;
-            background:rgba(212,175,55,0.1);
-            border-radius:10px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.1rem;
-        }
-
-        .contact-item-label { font-size:0.72rem; color:var(--text-muted); margin-bottom:2px; text-transform:uppercase; letter-spacing:1px; }
-        .contact-item-value { font-size:0.9rem; font-weight:600; color:var(--text); }
-
-        .contact-form {
-            background:var(--card);
-            border:1px solid rgba(255,255,255,0.06);
-            border-radius:25px;
-            padding:40px;
-        }
-
-        .contact-form h3 {
-            font-size:1.3rem; font-weight:700;
-            margin-bottom:25px;
-        }
-
-        .form-group { margin-bottom:18px; }
-        .form-group label { display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
-
-        .form-input {
-            width:100%;
-            background:var(--dark);
-            border:1px solid rgba(255,255,255,0.08);
-            border-radius:12px;
-            padding:13px 16px;
-            color:var(--text);
-            font-family:inherit;
-            font-size:0.9rem;
-            outline:none;
-            transition:all 0.3s;
-        }
-
-        .form-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,0.1); }
-        .form-input::placeholder { color:var(--text-muted); opacity:0.6; }
-
-        textarea.form-input { resize:vertical; min-height:110px; }
-
-        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-
-        .form-submit {
-            width:100%;
-            background:linear-gradient(135deg, var(--gold3), var(--gold));
-            color:var(--dark);
-            border:none;
-            border-radius:12px;
-            padding:14px;
-            font-family:inherit;
-            font-size:1rem;
-            font-weight:700;
-            cursor:pointer;
-            transition:all 0.3s;
-            margin-top:5px;
-        }
-
-        .form-submit:hover { transform:translateY(-2px); box-shadow:0 10px 25px rgba(212,175,55,0.35); }
-
-        /* ===== SOCIAL ===== */
-        .social-links { display:flex; gap:12px; margin-top:25px; }
-        .social-link {
-            width:42px; height:42px;
-            border-radius:10px;
-            background:var(--card);
-            border:1px solid rgba(255,255,255,0.08);
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.1rem;
-            text-decoration:none;
-            transition:all 0.3s;
-            cursor:pointer;
-        }
-        .social-link:hover { background:rgba(212,175,55,0.15); border-color:rgba(212,175,55,0.3); transform:translateY(-3px); }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            background:var(--dark2);
-            border-top:1px solid rgba(212,175,55,0.1);
-            padding:50px 40px 25px;
-        }
-
-        .footer-grid {
-            display:grid;
-            grid-template-columns:2fr 1fr 1fr;
-            gap:50px;
-            margin-bottom:40px;
-        }
-
-        .footer-brand .logo { display:flex; align-items:center; gap:12px; margin-bottom:15px; }
-        .footer-brand p { font-size:0.85rem; color:var(--text-muted); line-height:1.7; }
-
-        .footer-col h4 { font-size:0.9rem; font-weight:700; color:var(--gold); margin-bottom:18px; letter-spacing:1px; text-transform:uppercase; }
-        .footer-col ul { list-style:none; }
-        .footer-col ul li { margin-bottom:10px; }
-        .footer-col ul li a { color:var(--text-muted); text-decoration:none; font-size:0.85rem; transition:color 0.3s; }
-        .footer-col ul li a:hover { color:var(--gold); }
-
-        .footer-bottom {
-            display:flex; align-items:center; justify-content:space-between;
-            padding-top:25px;
-            border-top:1px solid rgba(255,255,255,0.05);
-            font-size:0.8rem;
-            color:var(--text-muted);
-            flex-wrap:wrap;
-            gap:10px;
-        }
-
-        .footer-tagline {
-            color:var(--gold);
-            font-weight:600;
-            font-size:0.82rem;
-        }
-
-        /* ===== FLOATING WHATSAPP ===== */
-        .whatsapp-float {
-            position:fixed;
-            bottom:30px; right:30px;
-            z-index:500;
-            animation:float 3s ease-in-out infinite;
-        }
-
-        .whatsapp-btn {
-            width:58px; height:58px;
-            background:linear-gradient(135deg, #25D366, #128C7E);
-            border-radius:50%;
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.6rem;
-            box-shadow:0 8px 25px rgba(37,211,102,0.4);
-            cursor:pointer;
-            transition:transform 0.3s;
-            text-decoration:none;
-        }
-
-        .whatsapp-btn:hover { transform:scale(1.15); }
-
-        .whatsapp-tooltip {
-            position:absolute;
-            right:70px; top:50%;
-            transform:translateY(-50%);
-            background:var(--dark2);
-            border:1px solid rgba(255,255,255,0.1);
-            border-radius:10px;
-            padding:8px 14px;
-            font-size:0.8rem;
-            white-space:nowrap;
-            color:var(--text);
-            opacity:0;
-            pointer-events:none;
-            transition:opacity 0.3s;
-        }
-
-        .whatsapp-float:hover .whatsapp-tooltip { opacity:1; }
-
-        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-
-        /* ===== BACK TO TOP ===== */
-        .back-top {
-            position:fixed;
-            bottom:100px; right:30px;
-            z-index:500;
-            width:42px; height:42px;
-            background:rgba(212,175,55,0.15);
-            border:1px solid rgba(212,175,55,0.3);
-            border-radius:10px;
-            display:flex; align-items:center; justify-content:center;
-            cursor:pointer;
-            transition:all 0.3s;
-            opacity:0; pointer-events:none;
-            font-size:1rem;
-            color:var(--gold);
-        }
-
-        .back-top.show { opacity:1; pointer-events:all; }
-        .back-top:hover { background:rgba(212,175,55,0.3); transform:translateY(-3px); }
-
-        /* ===== REVEAL ANIMATION ===== */
-        .reveal {
-            opacity:0;
-            transform:translateY(30px);
-            transition:all 0.7s cubic-bezier(0.4,0,0.2,1);
-        }
-        .reveal.visible { opacity:1; transform:translateY(0); }
-        .reveal-left { opacity:0; transform:translateX(-30px); transition:all 0.7s cubic-bezier(0.4,0,0.2,1); }
-        .reveal-left.visible { opacity:1; transform:translateX(0); }
-        .reveal-right { opacity:0; transform:translateX(30px); transition:all 0.7s cubic-bezier(0.4,0,0.2,1); }
-        .reveal-right.visible { opacity:1; transform:translateX(0); }
-
-        /* ===== RESPONSIVE ===== */
-        @media(max-width:1024px) {
-            .why-grid { grid-template-columns:1fr; gap:40px; }
-            .why-image img { height:350px; }
-            .contact-grid { grid-template-columns:1fr; gap:40px; }
-            .footer-grid { grid-template-columns:1fr 1fr; }
-        }
-
-        @media(max-width:768px) {
-            .section-pad { padding:70px 20px; }
-            .nav-links, .nav-cta { display:none; }
-            .hamburger { display:flex; }
-            .navbar { padding:15px 20px; }
-            .navbar.scrolled { padding:12px 20px; }
-            .services-grid { grid-template-columns:1fr 1fr; }
-            .gallery-grid { grid-template-columns:repeat(2,1fr); }
-            .gallery-item.big { grid-column:span 2; }
-            .gallery-item.big img { height:250px; }
-            .process-steps { grid-template-columns:repeat(2,1fr); }
-            .process-steps::before { display:none; }
-            .testimonial-grid { grid-template-columns:1fr; }
-            .footer-grid { grid-template-columns:1fr; }
-            .footer-bottom { flex-direction:column; text-align:center; }
-            .why-float-card { display:none; }
-            .hero-stats { gap:20px; }
-            .stat-divider { display:none; }
-        }
-
-        @media(max-width:480px) {
-            .services-grid { grid-template-columns:1fr; }
-            .gallery-grid { grid-template-columns:1fr; }
-            .gallery-item.big { grid-column:span 1; }
-            .process-steps { grid-template-columns:1fr; }
-            .form-row { grid-template-columns:1fr; }
-            .hero-btns { flex-direction:column; align-items:center; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>দুরন্ত ডিজিটাল সাইন | পাটগ্রাম</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪧</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#D4AF37;--gold2:#F5D06A;--gold3:#A0830A;
+  --dark:#08080F;--dark2:#0E0E1A;--dark3:#141424;
+  --card:#131320;--card2:#1A1A2E;
+  --text:#F0EEE8;--muted:#8888AA;--dim:#4A4A6A;
+  --green:#00C896;--purple:#6C63FF;--pink:#FF6584;
+  --r:16px;--r2:12px;--r3:8px;
+  --shadow:0 20px 60px rgba(0,0,0,0.5);
+  --gold-glow:0 0 30px rgba(212,175,55,0.2);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Hind Siliguri',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--dark)}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--gold3),var(--gold));border-radius:2px}
+img{display:block;max-width:100%}
+
+/* ── LOADER ── */
+#loader{
+  position:fixed;inset:0;background:var(--dark);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:9999;transition:opacity .8s ease,visibility .8s
+}
+#loader.out{opacity:0;visibility:hidden}
+.ld-ring{
+  width:70px;height:70px;border-radius:50%;
+  border:2px solid rgba(212,175,55,.1);
+  border-top-color:var(--gold);
+  animation:spin 1s linear infinite;margin-bottom:20px
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ld-text{font-size:.9rem;color:var(--gold);letter-spacing:3px;text-transform:uppercase}
+
+/* ── CANVAS ── */
+#cvs{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  padding:18px 5%;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:all .4s ease
+}
+nav.solid{
+  background:rgba(8,8,15,.92);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(212,175,55,.1);
+  padding:13px 5%
+}
+.nl{display:flex;align-items:center;gap:12px;text-decoration:none}
+.ni{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold3),var(--gold));
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;
+  box-shadow:0 4px 15px rgba(212,175,55,.35)
+}
+.nt h2{font-size:.95rem;font-weight:700;color:var(--gold);line-height:1.2}
+.nt p{font-size:.65rem;color:var(--muted)}
+.nm{display:flex;align-items:center;gap:24px;list-style:none}
+.nm a{
+  color:var(--muted);text-decoration:none;font-size:.85rem;font-weight:500;
+  transition:color .3s;position:relative;padding-bottom:3px
+}
+.nm a::after{
+  content:'';position:absolute;bottom:0;left:0;
+  width:0;height:1px;background:var(--gold);transition:width .3s
+}
+.nm a:hover{color:var(--gold)}
+.nm a:hover::after{width:100%}
+.nc{
+  background:linear-gradient(135deg,var(--gold3),var(--gold));
+  color:var(--dark)!important;padding:9px 20px;border-radius:25px;
+  font-weight:700!important;font-size:.82rem!important;
+  box-shadow:0 4px 15px rgba(212,175,55,.3);transition:all .3s!important
+}
+.nc::after{display:none!important}
+.nc:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(212,175,55,.45)!important}
+.hbg{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:601}
+.hbg span{width:24px;height:2px;background:var(--gold);border-radius:2px;transition:all .3s}
+.hbg.x span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hbg.x span:nth-child(2){opacity:0}
+.hbg.x span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+
+/* ── MOBILE MENU ── */
+.mm{
+  position:fixed;top:0;right:0;width:280px;height:100vh;
+  background:var(--dark2);border-left:1px solid rgba(212,175,55,.1);
+  z-index:600;padding:90px 30px 30px;
+  transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)
+}
+.mm.open{transform:translateX(0)}
+.mm a{
+  display:flex;align-items:center;gap:10px;
+  color:var(--muted);text-decoration:none;font-size:.95rem;
+  padding:13px 0;border-bottom:1px solid rgba(255,255,255,.04);
+  transition:color .3s
+}
+.mm a:hover{color:var(--gold)}
+.mo{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);
+  backdrop-filter:blur(4px);z-index:580
+}
+.mo.open{display:block}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  position:relative;overflow:hidden;padding:120px 5% 80px
+}
+.hbg-img{
+  position:absolute;inset:0;
+  background:
+    url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1600&q=80') center/cover no-repeat;
+  filter:brightness(.18) saturate(1.2)
+}
+.hbg-grad{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(135deg,rgba(8,8,15,.95) 0%,rgba(8,8,15,.7) 50%,rgba(8,8,15,.85) 100%),
+    radial-gradient(ellipse at 70% 50%,rgba(212,175,55,.06),transparent 60%)
+}
+.hc{position:relative;z-index:1;max-width:700px}
+.hbadge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);
+  border-radius:25px;padding:7px 18px;font-size:.78rem;color:var(--gold);
+  margin-bottom:28px;animation:fd .8s ease both
+}
+.pulse{
+  width:8px;height:8px;border-radius:50%;background:var(--green);
+  animation:blink 1.5s ease-in-out infinite
+}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
+.hgreet{font-size:.9rem;color:var(--muted);margin-bottom:12px;animation:fd .9s ease both .1s}
+.htitle{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.2rem,5.5vw,4rem);font-weight:900;line-height:1.15;
+  margin-bottom:20px;animation:fd 1s ease both .2s
+}
+.htitle .g{
+  background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
+}
+.hsub{
+  font-size:clamp(.95rem,2vw,1.15rem);color:var(--muted);
+  line-height:1.75;margin-bottom:35px;animation:fd 1s ease both .3s;max-width:560px
+}
+.hbtns{display:flex;gap:14px;flex-wrap:wrap;animation:fd 1s ease both .4s}
+.bg{
+  background:linear-gradient(135deg,var(--gold3),var(--gold));
+  color:var(--dark);border:none;border-radius:50px;padding:14px 30px;
+  font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;
+  transition:all .3s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 8px 25px rgba(212,175,55,.3)
+}
+.bg:hover{transform:translateY(-3px);box-shadow:0 15px 35px rgba(212,175,55,.45)}
+.bo{
+  background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.15);
+  border-radius:50px;padding:14px 30px;font-family:inherit;font-size:.95rem;
+  font-weight:600;cursor:pointer;transition:all .3s;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;backdrop-filter:blur(10px)
+}
+.bo:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-3px)}
+
+/* ── HERO STATS ── */
+.hstats{
+  display:flex;gap:0;margin-top:55px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r);overflow:hidden;backdrop-filter:blur(10px);
+  animation:fd 1s ease both .5s;width:fit-content;flex-wrap:wrap
+}
+.hs{
+  padding:18px 30px;text-align:center;
+  border-right:1px solid rgba(255,255,255,.07)
+}
+.hs:last-child{border-right:none}
+.hn{
+  font-family:'Playfair Display',serif;
+  font-size:1.7rem;font-weight:700;color:var(--gold);line-height:1
+}
+.hl{font-size:.72rem;color:var(--muted);margin-top:4px}
+
+/* ── HERO RIGHT IMAGE ── */
+.hright{
+  position:absolute;right:5%;top:50%;transform:translateY(-50%);
+  width:min(420px,42%);animation:fd 1s ease both .4s;z-index:1
+}
+.himg-stack{position:relative;height:520px}
+.himg1,.himg2,.himg3{
+  position:absolute;border-radius:var(--r);overflow:hidden;
+  box-shadow:var(--shadow)
+}
+.himg1{width:75%;height:320px;right:0;top:0;border:2px solid rgba(212,175,55,.15)}
+.himg1 img,.himg2 img,.himg3 img{width:100%;height:100%;object-fit:cover}
+.himg2{width:60%;height:220px;left:0;bottom:0;border:2px solid rgba(212,175,55,.1)}
+.himg3{
+  width:130px;height:130px;border-radius:50%;
+  top:50%;left:0;transform:translateY(-50%);
+  border:3px solid var(--gold);
+  box-shadow:0 0 0 8px rgba(212,175,55,.1),var(--shadow)
+}
+.hbadge2{
+  position:absolute;top:-15px;right:0;
+  background:linear-gradient(135deg,var(--gold3),var(--gold));
+  color:var(--dark);border-radius:12px;padding:12px 16px;
+  font-size:.78rem;font-weight:700;box-shadow:var(--shadow);text-align:center;white-space:nowrap
+}
+.hbadge3{
+  position:absolute;bottom:30px;right:-10px;
+  background:var(--card2);border:1px solid rgba(212,175,55,.2);
+  border-radius:12px;padding:12px 16px;font-size:.78rem;
+  box-shadow:var(--shadow);white-space:nowrap
+}
+.hbadge3 span{display:block;color:var(--gold);font-weight:700;font-size:1.1rem}
+
+@keyframes fd{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── MARQUEE ── */
+.mq{
+  background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2),var(--gold));
+  padding:12px 0;overflow:hidden;position:relative;z-index:1
+}
+.mq-track{display:flex;animation:mq 25s linear infinite;white-space:nowrap}
+.mq-item{
+  display:inline-flex;align-items:center;gap:12px;
+  padding:0 25px;font-size:.82rem;font-weight:700;color:var(--dark)
+}
+.mq-dot{width:5px;height:5px;border-radius:50%;background:rgba(0,0,0,.3)}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── SECTION COMMON ── */
+section{position:relative;z-index:1}
+.sp{padding:90px 5%}
+.ct{max-width:1200px;margin:0 auto}
+.sh{text-align:center;margin-bottom:60px}
+.sbadge{
+  display:inline-block;
+  background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.18);
+  color:var(--gold);font-size:.7rem;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;padding:6px 16px;border-radius:20px;margin-bottom:14px
+}
+.stitle{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.7rem,4vw,2.6rem);font-weight:700;line-height:1.3;margin-bottom:14px
+}
+.stitle .g{
+  background:linear-gradient(135deg,var(--gold3),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
+}
+.ssub{font-size:.92rem;color:var(--muted);line-height:1.8;max-width:520px;margin:0 auto}
+
+/* ── SERVICES ── */
+.sv-bg{background:var(--dark2)}
+.sv-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px
+}
+.sv-card{
+  background:var(--card);border:1px solid rgba(255,255,255,.05);
+  border-radius:var(--r);padding:28px;
+  transition:all .4s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;cursor:pointer
+}
+.sv-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(212,175,55,.06),transparent);
+  opacity:0;transition:opacity .4s
+}
+.sv-card:hover{transform:translateY(-7px);border-color:rgba(212,175,55,.25);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.sv-card:hover::before{opacity:1}
+.sv-icon{
+  width:56px;height:56px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+  background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.12);
+  margin-bottom:18px;transition:all .4s
+}
+.sv-card:hover .sv-icon{
+  background:linear-gradient(135deg,var(--gold3),var(--gold));
+  transform:scale(1.1) rotate(5deg)
+}
+.sv-name{font-size:1rem;font-weight:700;margin-bottom:9px}
+.sv-desc{font-size:.82rem;color:var(--muted);line-height:1.7}
+.sv-tag{
+  display:inline-block;margin-top:14px;
+  background:rgba(212,175,55,.07);color:var(--gold);
+  font-size:.68rem;font-weight:700;padding:3px 11px;border-radius:20px;letter-spacing:.5px
+}
+.sv-wide{grid-column:span 2}
+@media(max-width:600px){.sv-wide{grid-column:span 1}}
+
+/* ── ABOUT/WHY ── */
+.ab-bg{background:var(--dark)}
+.ab-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.ab-img-wrap{position:relative}
+.ab-main{
+  width:100%;height:480px;border-radius:var(--r);overflow:hidden;
+  border:2px solid rgba(212,175,55,.12);box-shadow:var(--shadow)
+}
+.ab-main img{width:100%;height:100%;object-fit:cover}
+.ab-main-ov{
+  position:absolute;inset:0;border-radius:var(--r);
+  background:linear-gradient(to top,rgba(8,8,15,.6),transparent 60%)
+}
+.ab-sm1,.ab-sm2{
+  position:absolute;border-radius:var(--r2);overflow:hidden;
+  border:2px solid rgba(212,175,55,.15);box-shadow:var(--shadow)
+}
+.ab-sm1{width:150px;height:150px;bottom:-25px;right:-20px}
+.ab-sm1 img,.ab-sm2 img{width:100%;height:100%;object-fit:cover}
+.ab-sm2{width:130px;height:130px;top:-20px;left:-20px}
+.ab-fc{
+  position:absolute;bottom:20px;left:20px;
+  background:rgba(8,8,15,.85);backdrop-filter:blur(10px);
+  border:1px solid rgba(212,175,55,.2);border-radius:12px;padding:14px 18px
+}
+.ab-fc .n{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--gold)}
+.ab-fc .l{font-size:.7rem;color:var(--muted)}
+.ab-feats{display:flex;flex-direction:column;gap:18px;margin-top:30px}
+.ab-feat{
+  display:flex;gap:16px;align-items:flex-start;padding:18px;
+  background:var(--card);border:1px solid rgba(255,255,255,.05);
+  border-radius:var(--r2);transition:all .3s
+}
+.ab-feat:hover{border-color:rgba(212,175,55,.2);transform:translateX(5px)}
+.ab-fi{
+  width:42px;height:42px;flex-shrink:0;border-radius:10px;
+  background:rgba(212,175,55,.08);
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem
+}
+.ab-ft h4{font-size:.9rem;font-weight:700;margin-bottom:5px}
+.ab-ft p{font-size:.8rem;color:var(--muted);line-height:1.6}
+
+/* ── GALLERY ── */
+.gl-bg{background:var(--dark2)}
+.gl-grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  grid-template-rows:auto;
+  gap:14px
+}
+.gi{border-radius:var(--r2);overflow:hidden;position:relative;cursor:pointer}
+.gi img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.gi:hover img{transform:scale(1.07)}
+.gi-ov{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.8) 0%,transparent 60%);
+  opacity:0;transition:opacity .35s;
+  display:flex;align-items:flex-end;padding:18px
+}
+.gi:hover .gi-ov{opacity:1}
+.gi-label{color:white;font-weight:700;font-size:.88rem}
+.gi-sub{font-size:.72rem;color:rgba(255,255,255,.6);margin-top:2px}
+
+/* Layout */
+.gi:nth-child(1){grid-column:span 7;height:340px}
+.gi:nth-child(2){grid-column:span 5;height:340px}
+.gi:nth-child(3){grid-column:span 4;height:260px}
+.gi:nth-child(4){grid-column:span 4;height:260px}
+.gi:nth-child(5){grid-column:span 4;height:260px}
+.gi:nth-child(6){grid-column:span 6;height:260px}
+.gi:nth-child(7){grid-column:span 6;height:260px}
+
+/* ── PROCESS ── */
+.pr-bg{background:var(--dark)}
+.pr-steps{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:25px;position:relative
+}
+.pr-steps::before{
+  content:'';position:absolute;
+  top:38px;left:13%;right:13%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,.3),rgba(212,175,55,.3),transparent)
+}
+.pr-step{text-align:center;position:relative}
+.pr-num{
+  width:76px;height:76px;border-radius:50%;
+  background:var(--card);border:2px solid rgba(212,175,55,.25);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-family:'Playfair Display',serif;
+  font-size:1.4rem;font-weight:700;color:var(--gold);
+  transition:all .4s;position:relative;z-index:1
+}
+.pr-step:hover .pr-num{
+  background:linear-gradient(135deg,var(--gold3),var(--gold));
+  color:var(--dark);border-color:var(--gold);
+  transform:scale(1.1);box-shadow:0 10px 30px rgba(212,175,55,.35)
+}
+.pr-title{font-size:.92rem;font-weight:700;margin-bottom:8px}
+.pr-desc{font-size:.8rem;color:var(--muted);line-height:1.65}
+
+/* ── TESTIMONIALS ── */
+.ts-bg{background:var(--dark2)}
+.ts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.ts-card{
+  background:var(--card);border:1px solid rgba(255,255,255,.05);
+  border-radius:var(--r);padding:28px;transition:all .3s;position:relative
+}
+.ts-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--gold3),var(--gold));
+  border-radius:var(--r) var(--r) 0 0;opacity:0;transition:opacity .3s
+}
+.ts-card:hover{transform:translateY(-5px);border-color:rgba(212,175,55,.18)}
+.ts-card:hover::before{opacity:1}
+.ts-quote{font-size:2.5rem;color:var(--gold);opacity:.2;font-family:'Playfair Display',serif;line-height:1}
+.ts-stars{color:var(--gold);font-size:.78rem;margin:10px 0 14px}
+.ts-text{font-size:.84rem;color:var(--muted);line-height:1.8;font-style:italic;margin-bottom:20px}
+.ts-author{display:flex;align-items:center;gap:12px}
+.ts-av{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold3),var(--gold));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;font-weight:700;color:var(--dark)
+}
+.ts-name{font-size:.86rem;font-weight:700}
+.ts-role{font-size:.72rem;color:var(--muted)}
+
+/* ── CTA ── */
+.cta-bg{
+  background:linear-gradient(135deg,var(--dark2),var(--dark3));
+  position:relative;overflow:hidden
+}
+.cta-bg::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 20% 50%,rgba(212,175,55,.07),transparent 55%),
+    radial-gradient(ellipse at 80% 50%,rgba(108,99,255,.05),transparent 55%)
+}
+.cta-bg::after{
+  content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);
+  width:600px;height:600px;border-radius:50%;
+  border:1px solid rgba(212,175,55,.05)
+}
+.cta-content{text-align:center;position:relative;z-index:1}
+.cta-content .stitle{font-size:clamp(1.7rem,4vw,2.8rem);max-width:700px;margin:0 auto 20px}
+.cta-sub{font-size:.95rem;color:var(--muted);max-width:480px;margin:0 auto 35px;line-height:1.7}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ── CONTACT ── */
+.co-bg{background:var(--dark)}
+.co-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:60px;align-items:start}
+.co-info h3{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;margin-bottom:15px}
+.co-info p{color:var(--muted);font-size:.88rem;line-height:1.8;margin-bottom:28px}
+.co-items{display:flex;flex-direction:column;gap:14px}
+.co-item{
+  display:flex;gap:14px;align-items:center;padding:15px 18px;
+  background:var(--card);border:1px solid rgba(255,255,255,.05);
+  border-radius:var(--r2);transition:all .3s
+}
+.co-item:hover{border-color:rgba(212,175,55,.2);transform:translateX(5px)}
+.co-ii{
+  width:40px;height:40px;flex-shrink:0;border-radius:10px;
+  background:rgba(212,175,55,.08);
+  display:flex;align-items:center;justify-content:center;font-size:1rem
+}
+.co-il{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
+.co-iv{font-size:.87rem;font-weight:600}
+.co-social{display:flex;gap:10px;margin-top:22px}
+.co-sl{
+  width:40px;height:40px;border-radius:10px;
+  background:var(--card);border:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;text-decoration:none;transition:all .3s;cursor:pointer
+}
+.co-sl:hover{background:rgba(212,175,55,.12);border-color:rgba(212,175,55,.25);transform:translateY(-3px)}
+.co-form{
+  background:var(--card);border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r);padding:38px
+}
+.co-form h3{font-size:1.2rem;font-weight:700;margin-bottom:22px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:.72rem;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.8px}
+.fi{
+  width:100%;background:var(--dark);border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--r3);padding:12px 15px;color:var(--text);
+  font-family:inherit;font-size:.88rem;outline:none;transition:all .3s
+}
+.fi:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.08)}
+.fi::placeholder{color:var(--dim)}
+textarea.fi{resize:vertical;min-height:105px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fs{
+  width:100%;background:linear-gradient(135deg,var(--gold3),var(--gold));
+  color:var(--dark);border:none;border-radius:var(--r3);padding:14px;
+  font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;
+  transition:all .3s;margin-top:6px
+}
+.fs:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(212,175,55,.35)}
+
+/* ── MAP ── */
+.map-wrap{
+  height:220px;border-radius:var(--r2);overflow:hidden;
+  border:1px solid rgba(212,175,55,.15);margin-top:25px;
+  background:var(--dark3);display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;color:var(--muted);font-size:.85rem
+}
+.map-wrap a{
+  color:var(--gold);text-decoration:none;font-weight:600;
+  padding:8px 18px;border:1px solid rgba(212,175,55,.3);border-radius:25px;
+  transition:all .3s;font-size:.82rem
+}
+.map-wrap a:hover{background:rgba(212,175,55,.1)}
+
+/* ── FOOTER ── */
+footer{background:var(--dark2);border-top:1px solid rgba(212,175,55,.08);padding:55px 5% 25px}
+.fg-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:50px;margin-bottom:45px}
+.ff-brand p{font-size:.82rem;color:var(--muted);line-height:1.7;margin-top:14px}
+.ff-col h4{font-size:.78rem;font-weight:700;color:var(--gold);margin-bottom:16px;text-transform:uppercase;letter-spacing:1.5px}
+.ff-col ul{list-style:none}
+.ff-col ul li{margin-bottom:9px}
+.ff-col ul li a{color:var(--muted);text-decoration:none;font-size:.82rem;transition:color .3s}
+.ff-col ul li a:hover{color:var(--gold)}
+.fb{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:22px;border-top:1px solid rgba(255,255,255,.04);
+  font-size:.77rem;color:var(--muted);flex-wrap:wrap;gap:10px
+}
+.fb-tag{color:var(--gold);font-weight:600;font-size:.78rem}
+
+/* ── FLOATING ── */
+.wa-float{position:fixed;bottom:28px;right:28px;z-index:500}
+.wa-btn{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;box-shadow:0 8px 25px rgba(37,211,102,.4);
+  cursor:pointer;text-decoration:none;transition:transform .3s;
+  animation:float 3s ease-in-out infinite
+}
+.wa-btn:hover{transform:scale(1.15)!important}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wa-tip{
+  position:absolute;right:66px;top:50%;transform:translateY(-50%);
+  background:var(--dark2);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:7px 13px;font-size:.75rem;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .3s
+}
+.wa-float:hover .wa-tip{opacity:1}
+.btt{
+  position:fixed;bottom:95px;right:28px;z-index:500;
+  width:40px;height:40px;background:rgba(212,175,55,.12);
+  border:1px solid rgba(212,175,55,.25);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .3s;opacity:0;pointer-events:none;
+  color:var(--gold);font-size:1rem
+}
+.btt.show{opacity:1;pointer-events:all}
+.btt:hover{background:rgba(212,175,55,.25);transform:translateY(-3px)}
+
+/* ── REVEAL ── */
+.rv{opacity:0;transform:translateY(28px);transition:all .7s cubic-bezier(.4,0,.2,1)}
+.rvl{opacity:0;transform:translateX(-28px);transition:all .7s cubic-bezier(.4,0,.2,1)}
+.rvr{opacity:0;transform:translateX(28px);transition:all .7s cubic-bezier(.4,0,.2,1)}
+.rv.on,.rvl.on,.rvr.on{opacity:1;transform:none}
+
+/* ── TOAST ── */
+.toast-c{position:fixed;top:80px;right:20px;z-index:9000;display:flex;flex-direction:column;gap:10px}
+.toast{
+  background:var(--dark2);border-radius:12px;padding:14px 18px;
+  display:flex;align-items:center;gap:12px;min-width:260px;max-width:320px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+  animation:tin .4s cubic-bezier(.34,1.4,.64,1)
+}
+@keyframes tin{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast.ok{border-left:3px solid var(--green)}
+.toast.er{border-left:3px solid var(--pink)}
+.toast-icon{font-size:1.1rem;flex-shrink:0}
+.toast-msg{font-size:.83rem}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .hright{display:none}
+  .hc{max-width:100%}
+  .ab-grid{grid-template-columns:1fr;gap:45px}
+  .ab-main{height:380px}
+  .co-grid{grid-template-columns:1fr;gap:40px}
+  .fg-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:900px){
+  .nm,.nc{display:none}
+  .hbg{display:flex}
+  .sp{padding:70px 5%}
+  .gi:nth-child(1){grid-column:span 12;height:260px}
+  .gi:nth-child(2){grid-column:span 12;height:220px}
+  .gi:nth-child(3),.gi:nth-child(4),.gi:nth-child(5){grid-column:span 4;height:200px}
+  .gi:nth-child(6),.gi:nth-child(7){grid-column:span 6;height:200px}
+  .pr-steps{grid-template-columns:repeat(2,1fr)}
+  .pr-steps::before{display:none}
+  .ts-grid{grid-template-columns:1fr 1fr}
+  .fg-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  nav{padding:14px 4%}
+  nav.solid{padding:11px 4%}
+  .hbtns{flex-direction:column;align-items:flex-start}
+  .bg,.bo{width:100%;justify-content:center;padding:13px 20px}
+  .hstats{width:100%}
+  .hs{flex:1;padding:14px 10px}
+  .hn{font-size:1.3rem}
+  .gi:nth-child(n){grid-column:span 12;height:200px}
+  .pr-steps{grid-template-columns:1fr}
+  .ts-grid{grid-template-columns:1fr}
+  .ab-sm1,.ab-sm2{display:none}
+  .cta-btns{flex-direction:column;align-items:center}
+  .bg,.bo{width:100%;max-width:300px}
+  .fr{grid-template-columns:1fr}
+  .co-form{padding:24px}
+  .fg-grid{grid-template-columns:1fr}
+  .fb{flex-direction:column;text-align:center}
+  .sv-grid{grid-template-columns:1fr}
+  .wa-float{bottom:20px;right:20px}
+  .btt{bottom:85px;right:20px}
+}
+</style>
 </head>
 <body>
 
 <!-- LOADER -->
-<div class="loader" id="loader">
-    <div class="loader-inner">
-        <div class="loader-logo">🪧</div>
-        <div class="loader-text">দুরন্ত ডিজিটাল সাইন</div>
-        <div class="loader-bar"><div class="loader-fill"></div></div>
-    </div>
+<div id="loader">
+  <div class="ld-ring"></div>
+  <div class="ld-text">দুরন্ত ডিজিটাল সাইন</div>
 </div>
 
-<!-- PARTICLES -->
-<canvas id="particles"></canvas>
+<!-- CANVAS -->
+<canvas id="cvs"></canvas>
 
-<!-- MOBILE MENU OVERLAY -->
-<div class="menu-overlay" id="menuOverlay" onclick="closeMobileMenu()"></div>
-
-<!-- MOBILE MENU -->
-<div class="mobile-menu" id="mobileMenu">
-    <a href="#home" onclick="closeMobileMenu()">🏠 হোম</a>
-    <a href="#services" onclick="closeMobileMenu()">🎨 সেবাসমূহ</a>
-    <a href="#why-us" onclick="closeMobileMenu()">⭐ কেন আমরা</a>
-    <a href="#gallery" onclick="closeMobileMenu()">🖼️ গ্যালারি</a>
-    <a href="#contact" onclick="closeMobileMenu()">📞 যোগাযোগ</a>
-    <a href="tel:01710513624" style="color:var(--gold);font-weight:700;margin-top:15px;">📞 01710513624</a>
+<!-- MOBILE OVERLAY & MENU -->
+<div class="mo" id="mo" onclick="closeMM()"></div>
+<div class="mm" id="mm">
+  <a href="#home" onclick="closeMM()">🏠 হোম</a>
+  <a href="#services" onclick="closeMM()">🎨 সেবাসমূহ</a>
+  <a href="#about" onclick="closeMM()">⭐ আমাদের সম্পর্কে</a>
+  <a href="#gallery" onclick="closeMM()">🖼️ গ্যালারি</a>
+  <a href="#process" onclick="closeMM()">🔄 প্রক্রিয়া</a>
+  <a href="#contact" onclick="closeMM()">📞 যোগাযোগ</a>
+  <a href="tel:01710513624" style="color:var(--gold);font-weight:700;margin-top:10px;border-top:1px solid rgba(212,175,55,.2);padding-top:18px;">📞 01710513624</a>
 </div>
 
-<!-- NAVBAR -->
-<nav class="navbar" id="navbar">
-    <a href="#home" class="nav-logo">
-        <div class="nav-logo-icon">🪧</div>
-        <div class="nav-logo-text">
-            <h2>দুরন্ত ডিজিটাল সাইন</h2>
-            <p>ডিজাইনে দুরন্ত, মানে অনন্য</p>
-        </div>
-    </a>
-    <ul class="nav-links">
-        <li><a href="#home">হোম</a></li>
-        <li><a href="#services">সেবাসমূহ</a></li>
-        <li><a href="#why-us">কেন আমরা</a></li>
-        <li><a href="#gallery">গ্যালারি</a></li>
-        <li><a href="#process">প্রক্রিয়া</a></li>
-        <li><a href="#contact">যোগাযোগ</a></li>
-        <li><a href="tel:01710513624" class="nav-cta">📞 কল করুন</a></li>
-    </ul>
-    <div class="hamburger" onclick="toggleMobileMenu()">
-        <span></span><span></span><span></span>
-    </div>
+<!-- NAV -->
+<nav id="nav">
+  <a href="#home" class="nl">
+    <div class="ni">🪧</div>
+    <div class="nt"><h2>দুরন্ত ডিজিটাল সাইন</h2><p>ডিজাইনে দুরন্ত, মানে অনন্য</p></div>
+  </a>
+  <ul class="nm">
+    <li><a href="#home">হোম</a></li>
+    <li><a href="#services">সেবাসমূহ</a></li>
+    <li><a href="#about">আমাদের সম্পর্কে</a></li>
+    <li><a href="#gallery">গ্যালারি</a></li>
+    <li><a href="#process">প্রক্রিয়া</a></li>
+    <li><a href="#contact">যোগাযোগ</a></li>
+    <li><a href="tel:01710513624" class="nc">📞 কল করুন</a></li>
+  </ul>
+  <div class="hbg" id="hbg" onclick="toggleMM()">
+    <span></span><span></span><span></span>
+  </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero" id="home">
-    <div class="hero-bg"></div>
-    <div class="hero-grid"></div>
+  <div class="hbg-img"></div>
+  <div class="hbg-grad"></div>
 
-    <div class="hero-content">
-        <div class="hero-badge">
-            <span class="dot"></span>
-            পাটগ্রাম, লালমনিরহাট — সেরা মুদ্রণ সেবা
-        </div>
-
-        <p class="hero-greeting">আসসালামু আলাইকুম ওয়ারাহমাতুল্লাহ 🌙</p>
-
-        <h1 class="hero-title">
-            <span class="gold">দুরন্ত ডিজিটাল</span><br>
-            সাইন পাটগ্রাম
-        </h1>
-
-        <p class="hero-subtitle">
-            প্রিন্টিং থেকে ছাপানো — এক ছাদের নিচেই সব! ❤️
-        </p>
-
-        <p class="hero-tagline">
-            ডিজাইনে দুরন্ত, মানে অনন্য।
-        </p>
-
-        <div class="hero-btns">
-            <a href="#services" class="btn-gold">🎨 আমাদের সেবা দেখুন</a>
-            <a href="#contact" class="btn-outline">📞 যোগাযোগ করুন</a>
-        </div>
-
-        <div class="hero-stats">
-            <div class="stat-item">
-                <span class="stat-num" id="counter1">০</span>
-                <span class="stat-label">সন্তুষ্ট গ্রাহক</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-                <span class="stat-num" id="counter2">০</span>
-                <span class="stat-label">সেবার ধরন</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-                <span class="stat-num" id="counter3">০</span>
-                <span class="stat-label">বছরের অভিজ্ঞতা</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-                <span class="stat-num" id="counter4">০</span>
-                <span class="stat-label">সম্পন্ন অর্ডার</span>
-            </div>
-        </div>
+  <div class="hc">
+    <div class="hbadge">
+      <span class="pulse"></span>
+      পাটগ্রামের সেরা প্রিন্টিং সেবা
     </div>
-
-    <div class="hero-scroll" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">
-        <span>নিচে দেখুন</span>
-        <div class="scroll-line"></div>
+    <p class="hgreet">আসসালামু আলাইকুম ওয়ারাহমাতুল্লাহ 🌙</p>
+    <h1 class="htitle">
+      <span class="g">দুরন্ত ডিজিটাল</span><br>
+      সাইন পাটগ্রাম
+    </h1>
+    <p class="hsub">
+      প্রিন্টিং থেকে ছাপানো — এক ছাদের নিচেই সব! ❤️<br>
+      আপনার বিদ্যালয়, প্রতিষ্ঠান বা ব্যক্তিগত প্রয়োজনে আমরা প্রস্তুত।
+    </p>
+    <div class="hbtns">
+      <a href="#services" class="bg">🎨 আমাদের সেবা দেখুন</a>
+      <a href="#contact" class="bo">📞 যোগাযোগ করুন</a>
     </div>
+    <div class="hstats">
+      <div class="hs"><div class="hn" id="c1">০</div><div class="hl">সন্তুষ্ট গ্রাহক</div></div>
+      <div class="hs"><div class="hn" id="c2">০</div><div class="hl">সেবার ধরন</div></div>
+      <div class="hs"><div class="hn" id="c3">০</div><div class="hl">বছরের অভিজ্ঞতা</div></div>
+      <div class="hs"><div class="hn" id="c4">০</div><div class="hl">সম্পন্ন অর্ডার</div></div>
+    </div>
+  </div>
+
+  <div class="hright">
+    <div class="himg-stack">
+      <div class="himg1">
+        <img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=700&q=85" alt="ব্যানার প্রিন্ট">
+      </div>
+      <div class="himg2">
+        <img src="https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=500&q=85" alt="ভিজিটিং কার্ড">
+      </div>
+      <div class="himg3">
+        <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=300&q=85" alt="মগ প্রিন্ট">
+      </div>
+      <div class="hbadge2">🏆 উন্নত মান<br>নিশ্চিত</div>
+      <div class="hbadge3">
+        <span>২০০০+</span>
+        সম্পন্ন অর্ডার
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- MARQUEE -->
-<div class="marquee-section">
-    <div class="marquee-track" id="marqueeTrack">
-        <span class="marquee-item">🖨️ ব্যানার প্রিন্ট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">🏆 ক্রেস্ট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">🎽 গেঞ্জি প্রিন্ট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">☕ মগ প্রিন্ট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">💳 ভিজিটিং কার্ড <span class="marquee-dot"></span></span>
-        <span class="marquee-item">🪪 আইডি কার্ড <span class="marquee-dot"></span></span>
-        <span class="marquee-item">📜 সার্টিফিকেট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">💒 বিয়ের কার্ড <span class="marquee-dot"></span></span>
-        <span class="marquee-item">🖨️ ব্যানার প্রিন্ট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">🏆 ক্রেস্ট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">🎽 গেঞ্জি প্রিন্ট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">☕ মগ প্রিন্ট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">💳 ভিজিটিং কার্ড <span class="marquee-dot"></span></span>
-        <span class="marquee-item">🪪 আইডি কার্ড <span class="marquee-dot"></span></span>
-        <span class="marquee-item">📜 সার্টিফিকেট <span class="marquee-dot"></span></span>
-        <span class="marquee-item">💒 বিয়ের কার্ড <span class="marquee-dot"></span></span>
-    </div>
+<div class="mq">
+  <div class="mq-track" id="mq">
+    <span class="mq-item">🖨️ পিভিসি ব্যানার <span class="mq-dot"></span></span>
+    <span class="mq-item">🏆 ক্রেস্ট <span class="mq-dot"></span></span>
+    <span class="mq-item">🎽 গেঞ্জি প্রিন্ট <span class="mq-dot"></span></span>
+    <span class="mq-item">☕ মগ প্রিন্ট <span class="mq-dot"></span></span>
+    <span class="mq-item">💳 ভিজিটিং কার্ড <span class="mq-dot"></span></span>
+    <span class="mq-item">🪪 আইডি কার্ড <span class="mq-dot"></span></span>
+    <span class="mq-item">📜 সার্টিফিকেট <span class="mq-dot"></span></span>
+    <span class="mq-item">💒 বিয়ের কার্ড <span class="mq-dot"></span></span>
+    <span class="mq-item">🏷️ স্টিকার <span class="mq-dot"></span></span>
+    <span class="mq-item">🧾 ক্যাশমেমো <span class="mq-dot"></span></span>
+    <span class="mq-item">🖨️ পিভিসি ব্যানার <span class="mq-dot"></span></span>
+    <span class="mq-item">🏆 ক্রেস্ট <span class="mq-dot"></span></span>
+    <span class="mq-item">🎽 গেঞ্জি প্রিন্ট <span class="mq-dot"></span></span>
+    <span class="mq-item">☕ মগ প্রিন্ট <span class="mq-dot"></span></span>
+    <span class="mq-item">💳 ভিজিটিং কার্ড <span class="mq-dot"></span></span>
+    <span class="mq-item">🪪 আইডি কার্ড <span class="mq-dot"></span></span>
+    <span class="mq-item">📜 সার্টিফিকেট <span class="mq-dot"></span></span>
+    <span class="mq-item">💒 বিয়ের কার্ড <span class="mq-dot"></span></span>
+    <span class="mq-item">🏷️ স্টিকার <span class="mq-dot"></span></span>
+    <span class="mq-item">🧾 ক্যাশমেমো <span class="mq-dot"></span></span>
+  </div>
 </div>
 
 <!-- SERVICES -->
-<section class="services-section section-pad" id="services">
-    <div class="container">
-        <div class="services-header reveal">
-            <div class="section-badge">আমাদের সেবাসমূহ</div>
-            <h2 class="section-title">যা যা পাচ্ছেন <span class="gold">আমাদের কাছে</span></h2>
-            <p class="section-sub">আপনার বিদ্যালয়, প্রতিষ্ঠান বা ব্যক্তিগত প্রয়োজনে আমরা প্রস্তুত বিশ্বস্ত ও মানসম্মত ডিজাইন–প্রিন্ট সেবায়।</p>
-        </div>
-
-        <div class="services-grid">
-            <div class="service-card reveal">
-                <div class="service-icon">🖼️</div>
-                <div class="service-name">পিভিসি ব্যানার, পোস্টার ও ফেস্টুন</div>
-                <p class="service-desc">উচ্চমানের পিভিসি উপকরণে দীর্ঘস্থায়ী ব্যানার, আকর্ষণীয় পোস্টার ও রঙিন ফেস্টুন প্রিন্ট করুন যেকোনো সাইজে।</p>
-                <span class="service-tag">সুলভ মূল্যে</span>
-            </div>
-            <div class="service-card reveal">
-                <div class="service-icon">🏆</div>
-                <div class="service-name">ক্রেস্ট</div>
-                <p class="service-desc">বিশেষ অনুষ্ঠান, পুরস্কার বিতরণী বা সম্মাননার জন্য আকর্ষণীয় ও টেকসই ক্রেস্ট তৈরি করুন কাস্টম ডিজাইনে।</p>
-                <span class="service-tag">কাস্টম ডিজাইন</span>
-            </div>
-            <div class="service-card reveal">
-                <div class="service-icon">🏷️</div>
-                <div class="service-name">ভিনাইল স্টিকার ও ডিজিটাল সিল</div>
-                <p class="service-desc">যেকোনো আকৃতির ভিনাইল স্টিকার এবং ডিজিটাল সিল — দোকান, অফিস বা ব্যক্তিগত ব্যবহারের জন্য।</p>
-                <span class="service-tag">ওয়াটারপ্রুফ</span>
-            </div>
-            <div class="service-card reveal">
-                <div class="service-icon">☕</div>
-                <div class="service-name">মগ প্রিন্ট</div>
-                <p class="service-desc">ছবি বা কাস্টম ডিজাইনে মগ প্রিন্ট — উপহার হিসেবে বা প্রাতিষ্ঠানিক ব্যবহারের জন্য আদর্শ।</p>
-                <span class="service-tag">গিফট আইটেম</span>
-            </div>
-            <div class="service-card reveal">
-                <div class="service-icon">👕</div>
-                <div class="service-name">গেঞ্জি প্রিন্ট</div>
-                <p class="service-desc">যেকোনো ডিজাইনে টি-শার্ট ও গেঞ্জি প্রিন্ট। স্কুল, কলেজ, ক্লাব বা কোম্পানির ইউনিফর্মের জন্য আদর্শ।</p>
-                <span class="service-tag">বাল্ক অর্ডার</span>
-            </div>
-            <div class="service-card reveal">
-                <div class="service-icon">🧾</div>
-                <div class="service-name">ক্যাশমেমো</div>
-                <p class="service-desc">আপনার ব্যবসার জন্য কাস্টম ক্যাশমেমো বুক প্রিন্ট করুন — লোগো ও ব্র্যান্ডিং সহ।</p>
-                <span class="service-tag">ব্যবসায়িক</span>
-            </div>
-            <div class="service-card reveal">
-                <div class="service-icon">💳</div>
-                <div class="service-name">ভিজিটিং কার্ড</div>
-                <p class="service-desc">প্রফেশনাল ভিজিটিং কার্ড ডিজাইন ও প্রিন্ট — আপনার প্রথম পরিচয়কে করুন স্মরণীয়।</p>
-                <span class="service-tag">প্রফেশনাল</span>
-            </div>
-            <div class="service-card reveal">
-                <div class="service-icon">🪪</div>
-                <div class="service-name">আইডি কার্ড ও ফিতা প্রিন্ট</div>
-                <p class="service-desc">প্রাতিষ্ঠানিক আইডি কার্ড, উন্নতমানের ফিতা প্রিন্ট এবং কভার — স্কুল, কলেজ ও অফিসের জন্য।</p>
-                <span class="service-tag">প্রাতিষ্ঠানিক</span>
-            </div>
-            <div class="service-card reveal">
-                <div class="service-icon">💒</div>
-                <div class="service-name">বিয়ে ও হালখাতার কার্ড</div>
-                <p class="service-desc">বিশেষ মুহূর্তকে করুন আরও স্মরণীয় — সুন্দর ডিজাইনে বিয়ের কার্ড ও হালখাতার আমন্ত্রণপত্র।</p>
-                <span class="service-tag">বিশেষ অনুষ্ঠান</span>
-            </div>
-            <div class="service-card reveal">
-                <div class="service-icon">📜</div>
-                <div class="service-name">সার্টিফিকেট</div>
-                <p class="service-desc">প্রতিষ্ঠান বা সংস্থার জন্য কাস্টম সার্টিফিকেট ডিজাইন ও প্রিন্ট — উন্নত কাগজ ও মানসম্পন্ন ছাপায়।</p>
-                <span class="service-tag">উচ্চমান</span>
-            </div>
-            <div class="service-card reveal" style="grid-column:span 2; background:linear-gradient(135deg, rgba(212,175,55,0.06), rgba(108,99,255,0.04));">
-                <div class="service-icon" style="font-size:2rem;">🌍</div>
-                <div class="service-name">বাংলা, ইংরেজি, আরবি ও উর্দু ডিজাইন</div>
-                <p class="service-desc">যেকোনো ভাষায় ডিজাইন ও প্রিন্ট সেবা। বাংলা, ইংরেজি, আরবি এবং উর্দু — সব ভাষায় আমরা দক্ষ। মাদ্রাসা, মসজিদ, স্কুল বা অফিস — সবার জন্যই আমরা প্রস্তুত।</p>
-                <span class="service-tag">সব ভাষায়</span>
-            </div>
-        </div>
+<section class="sv-bg sp" id="services">
+  <div class="ct">
+    <div class="sh rv">
+      <div class="sbadge">আমাদের সেবাসমূহ</div>
+      <h2 class="stitle">যা যা পাচ্ছেন <span class="g">আমাদের কাছে</span></h2>
+      <p class="ssub">সুলভ মূল্যে উন্নতমানের ডিজাইন ও প্রিন্টিং সেবা — বাংলা, ইংরেজি, আরবি ও উর্দু সব ভাষায়।</p>
     </div>
+    <div class="sv-grid">
+      <div class="sv-card rv"><div class="sv-icon">🖼️</div><div class="sv-name">পিভিসি ব্যানার, পোস্টার ও ফেস্টুন</div><p class="sv-desc">উচ্চমানের পিভিসি উপকরণে যেকোনো সাইজের ব্যানার, পোস্টার ও রঙিন ফেস্টুন।</p><span class="sv-tag">যেকোনো সাইজ</span></div>
+      <div class="sv-card rv"><div class="sv-icon">🏆</div><div class="sv-name">ক্রেস্ট</div><p class="sv-desc">বিশেষ অনুষ্ঠান, পুরস্কার বিতরণী বা সম্মাননার জন্য কাস্টম ডিজাইনে আকর্ষণীয় ক্রেস্ট।</p><span class="sv-tag">কাস্টম ডিজাইন</span></div>
+      <div class="sv-card rv"><div class="sv-icon">🏷️</div><div class="sv-name">ভিনাইল স্টিকার ও ডিজিটাল সিল</div><p class="sv-desc">যেকোনো আকৃতির ওয়াটারপ্রুফ ভিনাইল স্টিকার এবং ডিজিটাল সিল।</p><span class="sv-tag">ওয়াটারপ্রুফ</span></div>
+      <div class="sv-card rv"><div class="sv-icon">☕</div><div class="sv-name">মগ প্রিন্ট</div><p class="sv-desc">ছবি বা কাস্টম ডিজাইনে মগ প্রিন্ট — উপহার বা প্রাতিষ্ঠানিক ব্যবহারের জন্য।</p><span class="sv-tag">গিফট আইটেম</span></div>
+      <div class="sv-card rv"><div class="sv-icon">👕</div><div class="sv-name">গেঞ্জি প্রিন্ট</div><p class="sv-desc">যেকোনো ডিজাইনে টি-শার্ট ও গেঞ্জি প্রিন্ট — স্কুল, ক্লাব বা কোম্পানির জন্য।</p><span class="sv-tag">বাল্ক অর্ডার</span></div>
+      <div class="sv-card rv"><div class="sv-icon">🧾</div><div class="sv-name">ক্যাশমেমো</div><p class="sv-desc">আপনার ব্যবসার জন্য কাস্টম ক্যাশমেমো বুক — লোগো ও ব্র্যান্ডিং সহ।</p><span class="sv-tag">ব্যবসায়িক</span></div>
+      <div class="sv-card rv"><div class="sv-icon">💳</div><div class="sv-name">ভিজিটিং কার্ড</div><p class="sv-desc">প্রফেশনাল ভিজিটিং কার্ড ডিজাইন ও প্রিন্ট — আপনার পরিচয়কে করুন স্মরণীয়।</p><span class="sv-tag">প্রফেশনাল</span></div>
+      <div class="sv-card rv"><div class="sv-icon">🪪</div><div class="sv-name">আইডি কার্ড ও ফিতা প্রিন্ট</div><p class="sv-desc">প্রাতিষ্ঠানিক আইডি কার্ড, উন্নতমানের ফিতা ও কভার — স্কুল, কলেজ ও অফিসের জন্য।</p><span class="sv-tag">প্রাতিষ্ঠানিক</span></div>
+      <div class="sv-card rv"><div class="sv-icon">💒</div><div class="sv-name">বিয়ে ও হালখাতার কার্ড</div><p class="sv-desc">বিশেষ মুহূর্তকে করুন স্মরণীয় — সুন্দর ডিজাইনে বিয়ের কার্ড ও আমন্ত্রণপত্র।</p><span class="sv-tag">বিশেষ অনুষ্ঠান</span></div>
+      <div class="sv-card rv"><div class="sv-icon">📜</div><div class="sv-name">সার্টিফিকেট</div><p class="sv-desc">কাস্টম সার্টিফিকেট ডিজাইন ও প্রিন্ট — উন্নত কাগজ ও মানসম্পন্ন ছাপায়।</p><span class="sv-tag">উচ্চমান</span></div>
+      <div class="sv-card rv sv-wide" style="background:linear-gradient(135deg,rgba(212,175,55,.05),rgba(108,99,255,.03));">
+        <div class="sv-icon" style="font-size:1.9rem;">🌍</div>
+        <div class="sv-name">বাংলা, ইংরেজি, আরবি ও উর্দু ডিজাইন ও প্রিন্টিং</div>
+        <p class="sv-desc">যেকোনো ভাষায় ডিজাইন ও প্রিন্ট সেবা। মাদ্রাসা, মসজিদ, স্কুল বা অফিস — সবার জন্য আমরা প্রস্তুত।</p>
+        <span class="sv-tag">সব ভাষায়</span>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- WHY US -->
-<section class="why-section section-pad" id="why-us">
-    <div class="container">
-        <div class="why-grid">
-            <div class="why-image-wrap reveal-left">
-                <div class="why-image">
-                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="প্রিন্টিং কাজ">
-                    <div class="why-image-overlay"></div>
-                </div>
-                <div class="why-float-card card1">
-                    <div class="float-num" id="floatCounter1">০+</div>
-                    <div class="float-label">সন্তুষ্ট গ্রাহক</div>
-                </div>
-                <div class="why-float-card card2">
-                    <div class="float-num">১০০%</div>
-                    <div class="float-label">মান নিশ্চিত</div>
-                </div>
-            </div>
-
-            <div class="reveal-right">
-                <div class="section-badge">কেন আমাদের বেছে নেবেন</div>
-                <h2 class="section-title">বিশ্বাসযোগ্যতাই<br><span class="gold">আমাদের শক্তি</span></h2>
-                <p class="section-sub">পাটগ্রামে সেরা মানের প্রিন্টিং সেবায় আমরা বছরের পর বছর ধরে আপনাদের পাশে আছি।</p>
-
-                <div class="why-features">
-                    <div class="why-feature">
-                        <div class="why-feature-icon">⚡</div>
-                        <div class="why-feature-text">
-                            <h4>দ্রুত ডেলিভারি</h4>
-                            <p>মেসেজ করলেই দ্রুত সাড়া পাবেন ইনশাআল্লাহ। সময়মতো ডেলিভারি আমাদের প্রতিশ্রুতি।</p>
-                        </div>
-                    </div>
-                    <div class="why-feature">
-                        <div class="why-feature-icon">💎</div>
-                        <div class="why-feature-text">
-                            <h4>উন্নত মান</h4>
-                            <p>উন্নতমানের মেশিন ও উপকরণ ব্যবহার করে প্রতিটি কাজে সর্বোচ্চ মান নিশ্চিত করা হয়।</p>
-                        </div>
-                    </div>
-                    <div class="why-feature">
-                        <div class="why-feature-icon">💰</div>
-                        <div class="why-feature-text">
-                            <h4>সুলভ মূল্য</h4>
-                            <p>সব কিছুই পাচ্ছেন সুলভ মূল্যে। বাজেটের মধ্যেই সেরা মানের কাজ পাওয়া সম্ভব আমাদের কাছে।</p>
-                        </div>
-                    </div>
-                    <div class="why-feature">
-                        <div class="why-feature-icon">🎨</div>
-                        <div class="why-feature-text">
-                            <h4>কাস্টম ডিজাইন</h4>
-                            <p>আপনার চাহিদা অনুযায়ী কাস্টম ডিজাইন তৈরি করা হয়। বাংলা, ইংরেজি, আরবি যেকোনো ভাষায়।</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- ABOUT / WHY US -->
+<section class="ab-bg sp" id="about">
+  <div class="ct">
+    <div class="ab-grid">
+      <div class="ab-img-wrap rvl">
+        <div class="ab-main">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=85" alt="প্রিন্টিং কাজ">
+          <div class="ab-main-ov"></div>
         </div>
+        <div class="ab-sm1">
+          <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&q=85" alt="গেঞ্জি প্রিন্ট">
+        </div>
+        <div class="ab-sm2">
+          <img src="https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=300&q=85" alt="কার্ড">
+        </div>
+        <div class="ab-fc">
+          <div class="n" id="fc1">০+</div>
+          <div class="l">সন্তুষ্ট গ্রাহক</div>
+        </div>
+      </div>
+
+      <div class="rvr">
+        <div class="sbadge">কেন আমাদের বেছে নেবেন</div>
+        <h2 class="stitle" style="text-align:left;margin-bottom:14px;">
+          বিশ্বাসযোগ্যতাই<br><span class="g">আমাদের শক্তি</span>
+        </h2>
+        <p style="font-size:.88rem;color:var(--muted);line-height:1.8;margin-bottom:5px;">
+          পাটগ্রামে সেরা মানের প্রিন্টিং সেবায় আমরা বছরের পর বছর আপনাদের পাশে আছি। মেসেজ করলেই দ্রুত সাড়া পাবেন ইনশাআল্লাহ।
+        </p>
+        <div class="ab-feats">
+          <div class="ab-feat"><div class="ab-fi">⚡</div><div class="ab-ft"><h4>দ্রুত ডেলিভারি</h4><p>মেসেজ করলেই দ্রুত সাড়া। সময়মতো ডেলিভারি আমাদের প্রতিশ্রুতি।</p></div></div>
+          <div class="ab-feat"><div class="ab-fi">💎</div><div class="ab-ft"><h4>উন্নত মান</h4><p>উচ্চমানের মেশিন ও উপকরণ ব্যবহারে প্রতিটি কাজে সর্বোচ্চ মান।</p></div></div>
+          <div class="ab-feat"><div class="ab-fi">💰</div><div class="ab-ft"><h4>সুলভ মূল্য</h4><p>বাজেটের মধ্যেই সেরা মান — সব কিছুই পাচ্ছেন সাশ্রয়ী মূল্যে।</p></div></div>
+          <div class="ab-feat"><div class="ab-fi">🎨</div><div class="ab-ft"><h4>কাস্টম ডিজাইন</h4><p>আপনার চাহিদায় কাস্টম ডিজাইন — যেকোনো ভাষা ও স্টাইলে।</p></div></div>
+        </div>
+      </div>
     </div>
+  </div>
 </section>
 
 <!-- GALLERY -->
-<section class="gallery-section section-pad" id="gallery">
-    <div class="container">
-        <div class="gallery-header reveal">
-            <div class="section-badge">আমাদের কাজ</div>
-            <h2 class="section-title">কাজের <span class="gold">নমুনা দেখুন</span></h2>
-            <p class="section-sub" style="margin:0 auto;">আমাদের দক্ষ দলের তৈরি কিছু সেরা কাজের নমুনা।</p>
-        </div>
-
-        <div class="gallery-grid">
-            <div class="gallery-item big reveal">
-                <img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=600&q=80" alt="ব্যানার প্রিন্ট">
-                <div class="gallery-overlay"><span>ব্যানার ও পোস্টার</span></div>
-            </div>
-            <div class="gallery-item reveal">
-                <img src="https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=400&q=80" alt="ভিজিটিং কার্ড">
-                <div class="gallery-overlay"><span>ভিজিটিং কার্ড</span></div>
-            </div>
-            <div class="gallery-item reveal">
-                <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80" alt="মগ প্রিন্ট">
-                <div class="gallery-overlay"><span>মগ প্রিন্ট</span></div>
-            </div>
-            <div class="gallery-item reveal">
-                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80" alt="গেঞ্জি প্রিন্ট">
-                <div class="gallery-overlay"><span>গেঞ্জি প্রিন্ট</span></div>
-            </div>
-            <div class="gallery-item reveal">
-                <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&q=80" alt="স্টিকার">
-                <div class="gallery-overlay"><span>ভিনাইল স্টিকার</span></div>
-            </div>
-            <div class="gallery-item reveal">
-                <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&q=80" alt="সার্টিফিকেট">
-                <div class="gallery-overlay"><span>সার্টিফিকেট</span></div>
-            </div>
-            <div class="gallery-item reveal">
-                <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&q=80" alt="বিয়ের কার্ড">
-                <div class="gallery-overlay"><span>বিয়ের কার্ড</span></div>
-            </div>
-        </div>
+<section class="gl-bg sp" id="gallery">
+  <div class="ct">
+    <div class="sh rv">
+      <div class="sbadge">আমাদের কাজ</div>
+      <h2 class="stitle">কাজের <span class="g">নমুনা দেখুন</span></h2>
+      <p class="ssub">আমাদের দক্ষ দলের তৈরি সেরা কাজের কিছু নমুনা।</p>
     </div>
+    <div class="gl-grid">
+      <div class="gi rv">
+        <img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&q=85" alt="ব্যানার ডিজাইন">
+        <div class="gi-ov"><div><div class="gi-label">ব্যানার ও পোস্টার</div><div class="gi-sub">পিভিসি ব্যানার, ফেস্টুন</div></div></div>
+      </div>
+      <div class="gi rv">
+        <img src="https://images.unsplash.com/photo-1542744094-24638eff58bb?w=600&q=85" alt="ডিজাইন কাজ">
+        <div class="gi-ov"><div><div class="gi-label">গ্রাফিক ডিজাইন</div><div class="gi-sub">সব ধরনের ডিজাইন</div></div></div>
+      </div>
+      <div class="gi rv">
+        <img src="https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=500&q=85" alt="ভিজিটিং কার্ড">
+        <div class="gi-ov"><div><div class="gi-label">ভিজিটিং কার্ড</div><div class="gi-sub">প্রফেশনাল কার্ড</div></div></div>
+      </div>
+      <div class="gi rv">
+        <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=500&q=85" alt="মগ প্রিন্ট">
+        <div class="gi-ov"><div><div class="gi-label">মগ প্রিন্ট</div><div class="gi-sub">কাস্টম গিফট আইটেম</div></div></div>
+      </div>
+      <div class="gi rv">
+        <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=85" alt="গেঞ্জি প্রিন্ট">
+        <div class="gi-ov"><div><div class="gi-label">গেঞ্জি প্রিন্ট</div><div class="gi-sub">টি-শার্ট কাস্টমাইজ</div></div></div>
+      </div>
+      <div class="gi rv">
+        <img src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=600&q=85" alt="সার্টিফিকেট">
+        <div class="gi-ov"><div><div class="gi-label">সার্টিফিকেট</div><div class="gi-sub">উচ্চমানের প্রিন্ট</div></div></div>
+      </div>
+      <div class="gi rv">
+        <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=85" alt="বিয়ের কার্ড">
+        <div class="gi-ov"><div><div class="gi-label">বিয়ের কার্ড</div><div class="gi-sub">বিশেষ আমন্ত্রণপত্র</div></div></div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- PROCESS -->
-<section class="process-section section-pad" id="process">
-    <div class="container">
-        <div class="process-header reveal">
-            <div class="section-badge">কাজের প্রক্রিয়া</div>
-            <h2 class="section-title">মাত্র <span class="gold">৪টি ধাপে</span> আপনার কাজ</h2>
-            <p class="section-sub" style="margin:0 auto;">অর্ডার থেকে ডেলিভারি পর্যন্ত সহজ ও স্বচ্ছ প্রক্রিয়া।</p>
-        </div>
-
-        <div class="process-steps">
-            <div class="process-step reveal">
-                <div class="step-num">০১</div>
-                <h3 class="step-title">যোগাযোগ করুন</h3>
-                <p class="step-desc">ফোন বা মেসেজে আপনার প্রয়োজনীয়তা জানান। আমরা সাথে সাথে সাড়া দেব।</p>
-            </div>
-            <div class="process-step reveal">
-                <div class="step-num">০২</div>
-                <h3 class="step-title">ডিজাইন অনুমোদন</h3>
-                <p class="step-desc">আমাদের ডিজাইনার আপনার চাহিদা অনুযায়ী ডিজাইন তৈরি করবে এবং অনুমোদনের জন্য পাঠাবে।</p>
-            </div>
-            <div class="process-step reveal">
-                <div class="step-num">০৩</div>
-                <h3 class="step-title">প্রিন্টিং শুরু</h3>
-                <p class="step-desc">ডিজাইন অনুমোদনের পর উন্নত মেশিনে প্রিন্টিং শুরু হবে। মান নিয়ে কোনো আপোষ নেই।</p>
-            </div>
-            <div class="process-step reveal">
-                <div class="step-num">০৪</div>
-                <h3 class="step-title">ডেলিভারি</h3>
-                <p class="step-desc">নির্ধারিত সময়ের মধ্যে আপনার কাজ সম্পন্ন হয়ে যাবে ইনশাআল্লাহ।</p>
-            </div>
-        </div>
+<section class="pr-bg sp" id="process">
+  <div class="ct">
+    <div class="sh rv">
+      <div class="sbadge">কাজের প্রক্রিয়া</div>
+      <h2 class="stitle">মাত্র <span class="g">৪টি ধাপে</span> আপনার কাজ</h2>
+      <p class="ssub">অর্ডার থেকে ডেলিভারি — সহজ ও স্বচ্ছ প্রক্রিয়া।</p>
     </div>
+    <div class="pr-steps">
+      <div class="pr-step rv"><div class="pr-num">০১</div><h3 class="pr-title">যোগাযোগ করুন</h3><p class="pr-desc">ফোন বা মেসেজে আপনার প্রয়োজনীয়তা জানান। আমরা দ্রুত সাড়া দেব।</p></div>
+      <div class="pr-step rv"><div class="pr-num">০২</div><h3 class="pr-title">ডিজাইন অনুমোদন</h3><p class="pr-desc">আমাদের ডিজাইনার চাহিদা অনুযায়ী ডিজাইন তৈরি করে অনুমোদনের জন্য পাঠাবে।</p></div>
+      <div class="pr-step rv"><div class="pr-num">০৩</div><h3 class="pr-title">প্রিন্টিং শুরু</h3><p class="pr-desc">অনুমোদনের পর উন্নত মেশিনে প্রিন্টিং শুরু। মানে কোনো আপোষ নেই।</p></div>
+      <div class="pr-step rv"><div class="pr-num">০৪</div><h3 class="pr-title">ডেলিভারি</h3><p class="pr-desc">নির্ধারিত সময়ের মধ্যে আপনার কাজ সম্পন্ন হবে ইনশাআল্লাহ।</p></div>
+    </div>
+  </div>
 </section>
 
 <!-- TESTIMONIALS -->
-<section class="testimonial-section section-pad" id="reviews">
-    <div class="container">
-        <div class="testimonial-header reveal">
-            <div class="section-badge">গ্রাহকদের মতামত</div>
-            <h2 class="section-title">তারা <span class="gold">কী বলছেন</span></h2>
-        </div>
-
-        <div class="testimonial-grid">
-            <div class="testimonial-card reveal">
-                <div class="testimonial-quote">"</div>
-                <div class="stars">★★★★★</div>
-                <p class="testimonial-text">অসাধারণ কাজ! আমাদের স্কুলের ব্যানার ও আইডি কার্ড খুব সুন্দর হয়েছে। দাম অনেক সাশ্রয়ী এবং সময়মতো ডেলিভারি পেয়েছি।</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">ম</div>
-                    <div>
-                        <div class="author-name">মোঃ রফিকুল ইসলাম</div>
-                        <div class="author-role">প্রধান শিক্ষক, পাটগ্রাম</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card reveal">
-                <div class="testimonial-quote">"</div>
-                <div class="stars">★★★★★</div>
-                <p class="testimonial-text">বিয়ের কার্ড এত সুন্দর হয়েছে যে সবাই প্রশংসা করেছেন। দুরন্ত সাইনের ডিজাইন সত্যিই অনন্য। সবাইকে রেকমেন্ড করব।</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">ফ</div>
-                    <div>
-                        <div class="author-name">ফারিদা বেগম</div>
-                        <div class="author-role">পাটগ্রাম সদর</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card reveal">
-                <div class="testimonial-quote">"</div>
-                <div class="stars">★★★★★</div>
-                <p class="testimonial-text">গেঞ্জি প্রিন্টের কাজ অত্যন্ত মানসম্পন্ন। আমাদের ক্লাবের ৫০টি গেঞ্জি অর্ডার করেছিলাম, সব একদম পারফেক্ট হয়েছে।</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">আ</div>
-                    <div>
-                        <div class="author-name">আরিফুল হক</div>
-                        <div class="author-role">পাটগ্রাম স্পোর্টস ক্লাব</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<section class="ts-bg sp" id="reviews">
+  <div class="ct">
+    <div class="sh rv">
+      <div class="sbadge">গ্রাহকদের মতামত</div>
+      <h2 class="stitle">তারা <span class="g">কী বলছেন</span></h2>
     </div>
+    <div class="ts-grid">
+      <div class="ts-card rv">
+        <div class="ts-quote">"</div>
+        <div class="ts-stars">★★★★★</div>
+        <p class="ts-text">অসাধারণ কাজ! আমাদের স্কুলের ব্যানার ও আইডি কার্ড খুব সুন্দর হয়েছে। দাম সাশ্রয়ী এবং সময়মতো ডেলিভারি পেয়েছি।</p>
+        <div class="ts-author"><div class="ts-av">র</div><div><div class="ts-name">মোঃ রফিকুল ইসলাম</div><div class="ts-role">প্রধান শিক্ষক, পাটগ্রাম</div></div></div>
+      </div>
+      <div class="ts-card rv">
+        <div class="ts-quote">"</div>
+        <div class="ts-stars">★★★★★</div>
+        <p class="ts-text">বিয়ের কার্ড এত সুন্দর হয়েছে যে সবাই প্রশংসা করেছেন। দুরন্ত সাইনের ডিজাইন সত্যিই অনন্য। সবাইকে রেকমেন্ড করব।</p>
+        <div class="ts-author"><div class="ts-av">ফ</div><div><div class="ts-name">ফারিদা বেগম</div><div class="ts-role">পাটগ্রাম সদর</div></div></div>
+      </div>
+      <div class="ts-card rv">
+        <div class="ts-quote">"</div>
+        <div class="ts-stars">★★★★★</div>
+        <p class="ts-text">গেঞ্জি প্রিন্টের কাজ অত্যন্ত মানসম্পন্ন। ৫০টি গেঞ্জি অর্ডার করেছিলাম, সব একদম পারফেক্ট হয়েছে।</p>
+        <div class="ts-author"><div class="ts-av">আ</div><div><div class="ts-name">আরিফুল হক</div><div class="ts-role">পাটগ্রাম স্পোর্টস ক্লাব</div></div></div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- CTA -->
-<section class="cta-section section-pad">
-    <div class="container">
-        <div class="cta-content reveal">
-            <div class="section-badge">আজই শুরু করুন</div>
-            <h2 class="section-title" style="margin:0 auto 20px;">
-                আপনার <span class="gold">স্বপ্নের ডিজাইন</span><br>আমাদের সাথে বাস্তবে রূপ দিন
-            </h2>
-            <p style="color:var(--text-muted);font-size:1rem;max-width:500px;margin:0 auto 35px;line-height:1.7;">
-                মেসেজ করলেই দ্রুত সাড়া পাবেন ইনশাআল্লাহ। সুলভ মূল্যে উন্নতমানের সেবা।
-            </p>
-            <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;">
-                <a href="tel:01710513624" class="btn-gold">📞 01710513624</a>
-                <a href="#contact" class="btn-outline">✉️ বার্তা পাঠান</a>
-            </div>
-        </div>
+<section class="cta-bg sp">
+  <div class="ct">
+    <div class="cta-content rv">
+      <div class="sbadge">আজই শুরু করুন</div>
+      <h2 class="stitle" style="max-width:680px;margin:0 auto 18px;">
+        আপনার <span class="g">স্বপ্নের ডিজাইন</span> বাস্তবে রূপ দিন
+      </h2>
+      <p class="cta-sub">মেসেজ করলেই দ্রুত সাড়া পাবেন ইনশাআল্লাহ। সুলভ মূল্যে উন্নতমানের সেবা।</p>
+      <div class="cta-btns">
+        <a href="tel:01710513624" class="bg">📞 01710513624</a>
+        <a href="#contact" class="bo">✉️ বার্তা পাঠান</a>
+      </div>
     </div>
+  </div>
 </section>
 
 <!-- CONTACT -->
-<section class="contact-section section-pad" id="contact">
-    <div class="container">
-        <div class="contact-grid">
-            <div class="reveal-left">
-                <div class="section-badge">যোগাযোগ</div>
-                <h2 class="section-title">আমাদের সাথে<br><span class="gold">কথা বলুন</span></h2>
-                <p>যেকোনো প্রয়োজনে আমাদের সাথে যোগাযোগ করুন। আমরা সবসময় আপনার পাশে আছি।</p>
-
-                <div class="contact-items">
-                    <div class="contact-item">
-                        <div class="contact-item-icon">📍</div>
-                        <div>
-                            <div class="contact-item-label">ঠিকানা</div>
-                            <div class="contact-item-value">হোটেল সাদিকের নিচতলা, বড় মসজিদের সামনে, পাটগ্রাম, লালমনিরহাট</div>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-item-icon">📞</div>
-                        <div>
-                            <div class="contact-item-label">ফোন নম্বর</div>
-                            <div class="contact-item-value"><a href="tel:01710513624" style="color:var(--gold);text-decoration:none;">01710513624</a></div>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-item-icon">🕐</div>
-                        <div>
-                            <div class="contact-item-label">সময়সূচী</div>
-                            <div class="contact-item-value">শনি – বৃহস্পতি: সকাল ৯টা – রাত ৯টা</div>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-item-icon">💬</div>
-                        <div>
-                            <div class="contact-item-label">মেসেজ</div>
-                            <div class="contact-item-value">যেকোনো সময় মেসেজ করুন — দ্রুত সাড়া পাবেন</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="social-links">
-                    <a class="social-link" href="tel:01710513624" title="ফোন">📞</a>
-                    <a class="social-link" href="https://wa.me/8801710513624" title="WhatsApp" target="_blank">💬</a>
-                    <a class="social-link" href="#" title="Facebook">👥</a>
-                    <a class="social-link" href="#" title="Location">📍</a>
-                </div>
-            </div>
-
-            <div class="contact-form reveal-right">
-                <h3>✉️ বার্তা পাঠান</h3>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>আপনার নাম</label>
-                        <input type="text" class="form-input" placeholder="নাম লিখুন..." id="contactName">
-                    </div>
-                    <div class="form-group">
-                        <label>ফোন নম্বর</label>
-                        <input type="tel" class="form-input" placeholder="01XXXXXXXXX" id="contactPhone">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>সেবার ধরন</label>
-                    <select class="form-input" id="contactService">
-                        <option value="">সেবা নির্বাচন করুন...</option>
-                        <option>পিভিসি ব্যানার / পোস্টার</option>
-                        <option>ক্রেস্ট</option>
-                        <option>ভিনাইল স্টিকার / ডিজিটাল সিল</option>
-                        <option>মগ প্রিন্ট</option>
-                        <option>গেঞ্জি প্রিন্ট</option>
-                        <option>ক্যাশমেমো</option>
-                        <option>ভিজিটিং কার্ড</option>
-                        <option>আইডি কার্ড / ফিতা</option>
-                        <option>বিয়ে / হালখাতার কার্ড</option>
-                        <option>সার্টিফিকেট</option>
-                        <option>অন্যান্য</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>বিস্তারিত লিখুন</label>
-                    <textarea class="form-input" placeholder="আপনার প্রয়োজনীয়তা বিস্তারিত লিখুন..." id="contactMessage"></textarea>
-                </div>
-
-                <button class="form-submit" onclick="submitForm()">
-                    ✉️ বার্তা পাঠান
-                </button>
-            </div>
+<section class="co-bg sp" id="contact">
+  <div class="ct">
+    <div class="co-grid">
+      <div class="rvl">
+        <div class="sbadge">যোগাযোগ</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;margin-bottom:14px;">আমাদের সাথে<br><span style="background:linear-gradient(135deg,var(--gold3),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">কথা বলুন</span></h3>
+        <p class="co-info p" style="color:var(--muted);font-size:.87rem;line-height:1.8;margin-bottom:25px;">যেকোনো প্রয়োজনে আমাদের সাথে যোগাযোগ করুন। আমরা সবসময় আপনার পাশে আছি।</p>
+        <div class="co-items">
+          <div class="co-item"><div class="co-ii">📍</div><div><div class="co-il">ঠিকানা</div><div class="co-iv">হোটেল সাদিকের নিচতলা, বড় মসজিদের সামনে, পাটগ্রাম, লালমনিরহাট</div></div></div>
+          <div class="co-item"><div class="co-ii">📞</div><div><div class="co-il">ফোন নম্বর</div><div class="co-iv"><a href="tel:01710513624" style="color:var(--gold);text-decoration:none;">01710513624</a></div></div></div>
+          <div class="co-item"><div class="co-ii">🕐</div><div><div class="co-il">সময়সূচী</div><div class="co-iv">শনি – বৃহস্পতি: সকাল ৯টা – রাত ৯টা</div></div></div>
+          <div class="co-item"><div class="co-ii">💬</div><div><div class="co-il">মেসেজ</div><div class="co-iv">যেকোনো সময় মেসেজ করুন — দ্রুত সাড়া পাবেন</div></div></div>
         </div>
+        <div class="co-social">
+          <a class="co-sl" href="tel:01710513624">📞</a>
+          <a class="co-sl" href="https://wa.me/8801710513624" target="_blank">💬</a>
+          <a class="co-sl" href="#">👥</a>
+          <a class="co-sl" href="#">📍</a>
+        </div>
+        <div class="map-wrap">
+          <div style="font-size:1.5rem;">🗺️</div>
+          <div>হোটেল সাদিকের নিচতলা, বড় মসজিদের সামনে, পাটগ্রাম</div>
+          <a href="https://maps.google.com/?q=Patgram,Lalmonirhat,Bangladesh" target="_blank">Google Maps-এ দেখুন →</a>
+        </div>
+      </div>
+
+      <div class="co-form rvr">
+        <h3>✉️ বার্তা পাঠান</h3>
+        <div class="fr">
+          <div class="fg"><label>আপনার নাম</label><input type="text" class="fi" placeholder="নাম লিখুন..." id="fn"></div>
+          <div class="fg"><label>ফোন নম্বর</label><input type="tel" class="fi" placeholder="01XXXXXXXXX" id="fp"></div>
+        </div>
+        <div class="fg">
+          <label>সেবার ধরন</label>
+          <select class="fi" id="fs">
+            <option value="">সেবা নির্বাচন করুন...</option>
+            <option>পিভিসি ব্যানার / পোস্টার / ফেস্টুন</option>
+            <option>ক্রেস্ট</option>
+            <option>ভিনাইল স্টিকার / ডিজিটাল সিল</option>
+            <option>মগ প্রিন্ট</option>
+            <option>গেঞ্জি প্রিন্ট</option>
+            <option>ক্যাশমেমো</option>
+            <option>ভিজিটিং কার্ড</option>
+            <option>আইডি কার্ড / ফিতা প্রিন্ট</option>
+            <option>বিয়ে / হালখাতার কার্ড</option>
+            <option>সার্টিফিকেট</option>
+            <option>অন্যান্য</option>
+          </select>
+        </div>
+        <div class="fg"><label>বিস্তারিত</label><textarea class="fi" placeholder="আপনার প্রয়োজনীয়তা বিস্তারিত লিখুন..." id="fm"></textarea></div>
+        <button class="fs" onclick="sendMsg()">✉️ WhatsApp-এ বার্তা পাঠান</button>
+      </div>
     </div>
+  </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <div class="logo">
-                    <div class="nav-logo-icon">🪧</div>
-                    <div>
-                        <div style="font-weight:700;color:var(--gold);">দুরন্ত ডিজিটাল সাইন</div>
-                        <div style="font-size:0.72rem;color:var(--text-muted);">পাটগ্রাম, লালমনিরহাট</div>
-                    </div>
-                </div>
-                <p>আপনার বিদ্যালয়, প্রতিষ্ঠান বা ব্যক্তিগত প্রয়োজনে আমরা প্রস্তুত বিশ্বস্ত ও মানসম্মত ডিজাইন–প্রিন্ট সেবায়। ডিজাইনে দুরন্ত, মানে অনন্য।</p>
-            </div>
-
-            <div class="footer-col">
-                <h4>সেবাসমূহ</h4>
-                <ul>
-                    <li><a href="#services">ব্যানার / পোস্টার</a></li>
-                    <li><a href="#services">ক্রেস্ট</a></li>
-                    <li><a href="#services">মগ প্রিন্ট</a></li>
-                    <li><a href="#services">গেঞ্জি প্রিন্ট</a></li>
-                    <li><a href="#services">ভিজিটিং কার্ড</a></li>
-                    <li><a href="#services">আইডি কার্ড</a></li>
-                    <li><a href="#services">সার্টিফিকেট</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h4>যোগাযোগ</h4>
-                <ul>
-                    <li><a href="#">📍 হোটেল সাদিকের নিচতলা</a></li>
-                    <li><a href="#">বড় মসজিদের সামনে</a></li>
-                    <li><a href="#">পাটগ্রাম, লালমনিরহাট</a></li>
-                    <li><a href="tel:01710513624">📞 01710513624</a></li>
-                    <li><a href="#">শনি – বৃহস্পতি</a></li>
-                    <li><a href="#">সকাল ৯টা – রাত ৯টা</a></li>
-                </ul>
-            </div>
+<footer>
+  <div class="ct">
+    <div class="fg-grid">
+      <div class="ff-brand">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <div class="ni">🪧</div>
+          <div><div style="font-weight:700;color:var(--gold);font-size:.95rem;">দুরন্ত ডিজিটাল সাইন</div><div style="font-size:.65rem;color:var(--muted);">পাটগ্রাম, লালমনিরহাট</div></div>
         </div>
-
-        <div class="footer-bottom">
-            <div>© ২০২৬ দুরন্ত ডিজিটাল সাইন পাটগ্রাম। সর্বস্বত্ব সংরক্ষিত।</div>
-            <div class="footer-tagline">ডিজাইনে দুরন্ত, মানে অনন্য ✨</div>
-        </div>
+        <p>আপনার বিদ্যালয়, প্রতিষ্ঠান বা ব্যক্তিগত প্রয়োজনে আমরা প্রস্তুত। ডিজাইনে দুরন্ত, মানে অনন্য।</p>
+      </div>
+      <div class="ff-col">
+        <h4>সেবাসমূহ</h4>
+        <ul>
+          <li><a href="#services">ব্যানার / পোস্টার</a></li>
+          <li><a href="#services">ক্রেস্ট</a></li>
+          <li><a href="#services">মগ ও গেঞ্জি প্রিন্ট</a></li>
+          <li><a href="#services">ভিজিটিং কার্ড</a></li>
+          <li><a href="#services">আইডি কার্ড</a></li>
+          <li><a href="#services">সার্টিফিকেট</a></li>
+        </ul>
+      </div>
+      <div class="ff-col">
+        <h4>যোগাযোগ</h4>
+        <ul>
+          <li><a href="#">📍 হোটেল সাদিকের নিচতলা</a></li>
+          <li><a href="#">বড় মসজিদের সামনে</a></li>
+          <li><a href="#">পাটগ্রাম, লালমনিরহাট</a></li>
+          <li><a href="tel:01710513624">📞 01710513624</a></li>
+          <li><a href="#">শনি – বৃহস্পতি, ৯টা – ৯টা</a></li>
+        </ul>
+      </div>
     </div>
+    <div class="fb">
+      <div>© ২০২৬ দুরন্ত ডিজিটাল সাইন পাটগ্রাম। সর্বস্বত্ব সংরক্ষিত।</div>
+      <div class="fb-tag">ডিজাইনে দুরন্ত, মানে অনন্য ✨</div>
+    </div>
+  </div>
 </footer>
 
-<!-- WHATSAPP FLOAT -->
-<div class="whatsapp-float">
-    <div class="whatsapp-tooltip">WhatsApp-এ মেসেজ করুন</div>
-    <a href="https://wa.me/8801710513624" target="_blank" class="whatsapp-btn">💬</a>
+<!-- FLOATING -->
+<div class="wa-float">
+  <div class="wa-tip">WhatsApp-এ মেসেজ করুন</div>
+  <a href="https://wa.me/8801710513624" target="_blank" class="wa-btn">💬</a>
 </div>
+<div class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
 
-<!-- BACK TO TOP -->
-<div class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+<div class="toast-c" id="tc"></div>
 
 <script>
-// ===== LOADER =====
-window.addEventListener('load', function() {
-    setTimeout(function() {
-        document.getElementById('loader').classList.add('hide');
-    }, 1800);
+// ── LOADER ──
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('loader').classList.add('out'),1600));
+
+// ── PARTICLES ──
+const cvs=document.getElementById('cvs'),ctx=cvs.getContext('2d');
+let W,H,pts=[];
+function resize(){W=cvs.width=innerWidth;H=cvs.height=innerHeight;pts=[];for(let i=0;i<90;i++)pts.push(mkP())}
+function mkP(){return{x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+.3,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,a:Math.random()*.35+.08,c:Math.random()>.55?'#D4AF37':'#6C63FF'}}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>W||p.y<0||p.y>H)Object.assign(p,mkP());
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.c;ctx.globalAlpha=p.a;ctx.fill();ctx.globalAlpha=1;
+  });
+  requestAnimationFrame(draw);
+}
+resize();window.addEventListener('resize',resize);draw();
+
+// ── NAV ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('solid',scrollY>60);
+  document.getElementById('btt').classList.toggle('show',scrollY>400);
 });
 
-// ===== PARTICLES =====
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-let particles = [];
-
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+// ── MOBILE MENU ──
+function toggleMM(){
+  document.getElementById('hbg').classList.toggle('x');
+  document.getElementById('mm').classList.toggle('open');
+  document.getElementById('mo').classList.toggle('open');
+}
+function closeMM(){
+  document.getElementById('hbg').classList.remove('x');
+  document.getElementById('mm').classList.remove('open');
+  document.getElementById('mo').classList.remove('open');
 }
 
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-class Particle {
-    constructor() { this.reset(); }
-    reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 1.5 + 0.3;
-        this.speedX = (Math.random() - 0.5) * 0.3;
-        this.speedY = (Math.random() - 0.5) * 0.3;
-        this.opacity = Math.random() * 0.4 + 0.1;
-        this.color = Math.random() > 0.6 ? '#D4AF37' : '#6C63FF';
-    }
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if(this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
-    }
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.opacity;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-    }
-}
-
-for(let i = 0; i < 80; i++) particles.push(new Particle());
-
-function animateParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => { p.update(); p.draw(); });
-    requestAnimationFrame(animateParticles);
-}
-animateParticles();
-
-// ===== NAVBAR SCROLL =====
-window.addEventListener('scroll', function() {
-    const navbar = document.getElementById('navbar');
-    const backTop = document.getElementById('backTop');
-    if(window.scrollY > 80) {
-        navbar.classList.add('scrolled');
-        backTop.classList.add('show');
-    } else {
-        navbar.classList.remove('scrolled');
-        backTop.classList.remove('show');
-    }
+// ── SMOOTH SCROLL ──
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'})}
+  });
 });
 
-// ===== MOBILE MENU =====
-function toggleMobileMenu() {
-    document.getElementById('mobileMenu').classList.toggle('open');
-    document.getElementById('menuOverlay').classList.toggle('open');
-}
-function closeMobileMenu() {
-    document.getElementById('mobileMenu').classList.remove('open');
-    document.getElementById('menuOverlay').classList.remove('open');
-}
-
-// ===== SMOOTH SCROLL FOR NAV LINKS =====
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', function(e) {
-        const target = document.querySelector(this.getAttribute('href'));
-        if(target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
-});
-
-// ===== COUNTER ANIMATION =====
-const counters = [
-    { id: 'counter1', target: 500, suffix: '+' },
-    { id: 'counter2', target: 12, suffix: '+' },
-    { id: 'counter3', target: 5, suffix: '+' },
-    { id: 'counter4', target: 2000, suffix: '+' },
-];
-
-function animateCounter(el, target, suffix) {
-    let current = 0;
-    const step = target / 60;
-    const timer = setInterval(() => {
-        current += step;
-        if(current >= target) { current = target; clearInterval(timer); }
-        el.textContent = Math.floor(current) + suffix;
-    }, 30);
+// ── COUNTERS ──
+const ctrs=[{id:'c1',t:500,s:'+'},{id:'c2',t:12,s:'+'},{id:'c3',t:5,s:'+'},{id:'c4',t:2000,s:'+'}];
+let cDone=false;
+function runCtr(id,t,s){
+  const el=document.getElementById(id);if(!el)return;
+  let n=0,step=t/55;
+  const ti=setInterval(()=>{n+=step;if(n>=t){n=t;clearInterval(ti);}el.textContent=Math.floor(n)+s;},28);
 }
 
-let countersStarted = false;
-const heroObserver = new IntersectionObserver((entries) => {
-    if(entries[0].isIntersecting && !countersStarted) {
-        countersStarted = true;
-        counters.forEach(c => {
-            const el = document.getElementById(c.id);
-            if(el) animateCounter(el, c.target, c.suffix);
-        });
-        const fc1 = document.getElementById('floatCounter1');
-        if(fc1) { let n=0; const t=setInterval(()=>{ n+=10; if(n>=500){n=500;clearInterval(t);} fc1.textContent=n+'+'; },30); }
+// ── REVEAL ──
+const ro=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('on'),i*70);
+      ro.unobserve(e.target);
+      if(!cDone&&e.target.closest('#home')){
+        cDone=true;
+        ctrs.forEach(c=>runCtr(c.id,c.t,c.s));
+        let n=0;const fc=document.getElementById('fc1');
+        if(fc){const ti=setInterval(()=>{n+=10;if(n>=500){n=500;clearInterval(ti);}fc.textContent=n+'+';},28);}
+      }
     }
-}, { threshold: 0.3 });
+  });
+},{threshold:.12});
 
-const heroSection = document.querySelector('.hero');
-if(heroSection) heroObserver.observe(heroSection);
+document.querySelectorAll('.rv,.rvl,.rvr').forEach(el=>ro.observe(el));
 
-// ===== REVEAL ON SCROLL =====
-const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-        if(entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add('visible'), i * 80);
-            revealObserver.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.1 });
+// ── HERO auto-counter on load ──
+setTimeout(()=>{
+  if(!cDone){cDone=true;ctrs.forEach(c=>runCtr(c.id,c.t,c.s));}
+},2200);
 
-document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
-    revealObserver.observe(el);
-});
-
-// ===== SERVICE CARD DELAY =====
-document.querySelectorAll('.service-card').forEach((card, i) => {
-    card.style.transitionDelay = (i * 0.07) + 's';
-});
-
-// ===== FORM SUBMIT =====
-function submitForm() {
-    const name = document.getElementById('contactName').value.trim();
-    const phone = document.getElementById('contactPhone').value.trim();
-    const service = document.getElementById('contactService').value;
-    const message = document.getElementById('contactMessage').value.trim();
-
-    if(!name || !phone) {
-        showAlert('⚠️ নাম ও ফোন নম্বর দেওয়া আবশ্যক!', 'warning');
-        return;
-    }
-
-    const text = `আসসালামু আলাইকুম!%0A%0Aআমার নাম: ${name}%0Aফোন: ${phone}%0Aসেবা: ${service||'উল্লেখ নেই'}%0Aবার্তা: ${message||'—'}`;
-    window.open(`https://wa.me/8801710513624?text=${text}`, '_blank');
-
-    showAlert('✅ ধন্যবাদ! আপনাকে WhatsApp-এ পাঠানো হচ্ছে।', 'success');
-
-    document.getElementById('contactName').value = '';
-    document.getElementById('contactPhone').value = '';
-    document.getElementById('contactService').value = '';
-    document.getElementById('contactMessage').value = '';
+// ── FORM SEND ──
+function sendMsg(){
+  const n=document.getElementById('fn').value.trim();
+  const p=document.getElementById('fp').value.trim();
+  const s=document.getElementById('fs').value;
+  const m=document.getElementById('fm').value.trim();
+  if(!n||!p){toast('⚠️ নাম ও ফোন নম্বর দেওয়া আবশ্যক!','er');return;}
+  const txt=`আসসালামু আলাইকুম!%0A%0A👤 নাম: ${n}%0A📞 ফোন: ${p}%0A🎨 সেবা: ${s||'উল্লেখ নেই'}%0A📝 বার্তা: ${m||'—'}`;
+  window.open(`https://wa.me/8801710513624?text=${txt}`,'_blank');
+  toast('✅ WhatsApp খুলছে...','ok');
+  ['fn','fp','fm'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fs').value='';
 }
 
-// ===== ALERT =====
-function showAlert(msg, type) {
-    const div = document.createElement('div');
-    div.style.cssText = `
-        position:fixed; top:80px; right:20px; z-index:9000;
-        background:${type==='success'?'#1a3a2a':'#3a1a1a'};
-        border:1px solid ${type==='success'?'#00C896':'#FFB830'};
-        border-radius:12px; padding:15px 20px;
-        font-size:0.9rem; color:white;
-        box-shadow:0 10px 30px rgba(0,0,0,0.4);
-        animation:slideIn 0.4s ease;
-        max-width:300px;
-    `;
-    div.textContent = msg;
-    const style = document.createElement('style');
-    style.textContent = '@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}';
-    document.head.appendChild(style);
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 4000);
+// ── TOAST ──
+function toast(msg,type='ok'){
+  const d=document.createElement('div');
+  d.className=`toast ${type}`;
+  d.innerHTML=`<span class="toast-icon">${type==='ok'?'✅':'⚠️'}</span><span class="toast-msg">${msg}</span>`;
+  document.getElementById('tc').appendChild(d);
+  setTimeout(()=>d.remove(),4000);
 }
 
-// ===== ACTIVE NAV ON SCROLL =====
-const sections = document.querySelectorAll('section[id]');
-window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(sec => {
-        if(window.scrollY >= sec.offsetTop - 120) current = sec.getAttribute('id');
-    });
-    document.querySelectorAll('.nav-links a').forEach(a => {
-        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--gold)' : '';
-    });
-});
+// ── ACTIVE NAV ──
+const secs=document.querySelectorAll('section[id]');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  secs.forEach(s=>{if(scrollY>=s.offsetTop-100)cur=s.id});
+  document.querySelectorAll('.nm a').forEach(a=>{
+    a.style.color=a.getAttribute('href')==='#'+cur?'var(--gold)':'';
+  });
+},{passive:true});
 </script>
 </body>
 </html>
