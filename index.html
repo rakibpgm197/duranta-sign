@@ -4,403 +4,199 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>দুরন্ত সাইন পাটগ্রাম</title>
-    <link rel="stylesheet" href="assets/css/style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪧</text></svg>">
-</head>
-<body>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
 
-<!-- ========== SIDEBAR ========== -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-        <div class="logo-icon">🪧</div>
-        <div>
-            <h2>দুরন্ত সাইন</h2>
-            <p>পাটগ্রাম · পাওনা ম্যানেজার</p>
-        </div>
-    </div>
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #5a52d5;
+            --primary-light: rgba(108,99,255,0.15);
+            --secondary: #FF6584;
+            --success: #00C896;
+            --success-light: rgba(0,200,150,0.15);
+            --warning: #FFB830;
+            --warning-light: rgba(255,184,48,0.15);
+            --danger: #FF5C5C;
+            --danger-light: rgba(255,92,92,0.15);
+            --info: #00BCD4;
+            --dark: #1A1A2E;
+            --dark2: #16213E;
+            --dark3: #0F3460;
+            --card: #1E1E35;
+            --card2: #252540;
+            --text: #E8E8F5;
+            --text-muted: #8888AA;
+            --text-dim: #5A5A7A;
+            --border: rgba(255,255,255,0.07);
+            --border2: rgba(255,255,255,0.12);
+            --glass: rgba(255,255,255,0.04);
+            --glass2: rgba(255,255,255,0.08);
+            --sidebar-width: 260px;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.3);
+            --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
 
-    <nav class="sidebar-menu">
-        <div class="menu-label">মেনু</div>
-        <div class="menu-item active" data-page="dashboard">
-            <span class="icon">📊</span> ড্যাশবোর্ড
-        </div>
-        <div class="menu-item" data-page="customers">
-            <span class="icon">👥</span> পাওনাদার তালিকা
-        </div>
-        <div class="menu-item" data-page="notes">
-            <span class="icon">📝</span> নোট / রিমাইন্ডার
-        </div>
-        <div class="menu-item" data-page="history">
-            <span class="icon">📋</span> পরিশোধের ইতিহাস
-        </div>
-        <div class="menu-label" style="margin-top:20px;">সরঞ্জাম</div>
-        <div class="menu-item" data-page="reports">
-            <span class="icon">📈</span> রিপোর্ট
-        </div>
-        <div class="menu-item" data-page="settings">
-            <span class="icon">⚙️</span> সেটিংস
-        </div>
-    </nav>
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body {
+            font-family:'Hind Siliguri','Segoe UI',sans-serif;
+            background:var(--dark);
+            color:var(--text);
+            min-height:100vh;
+            overflow-x:hidden;
+            line-height:1.6;
+        }
 
-    <div class="sidebar-footer">
-        <div class="sidebar-date" id="sidebarDate"></div>
-        <div style="margin-top:5px;font-size:0.72rem;opacity:0.6;">
-            v1.0 · ডেটা লোকালি সংরক্ষিত
-        </div>
-    </div>
-</aside>
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position:fixed; left:0; top:0;
+            width:var(--sidebar-width); height:100vh;
+            background:var(--dark2);
+            border-right:1px solid var(--border);
+            display:flex; flex-direction:column;
+            z-index:200;
+            transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            overflow-y:auto;
+        }
+        .sidebar::-webkit-scrollbar { width:3px; }
+        .sidebar::-webkit-scrollbar-thumb { background:var(--border2); }
 
-<!-- Mobile Overlay -->
-<div class="overlay-bg" id="overlayBg"></div>
+        .sidebar-logo {
+            display:flex; align-items:center; gap:14px;
+            padding:22px 20px;
+            border-bottom:1px solid var(--border);
+            background:linear-gradient(135deg,rgba(108,99,255,0.1),rgba(255,101,132,0.05));
+        }
+        .logo-icon {
+            width:48px; height:48px;
+            background:linear-gradient(135deg,var(--primary),var(--secondary));
+            border-radius:14px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.5rem; flex-shrink:0;
+            box-shadow:0 4px 15px rgba(108,99,255,0.4);
+        }
+        .sidebar-logo h2 { font-size:1rem; font-weight:700; }
+        .sidebar-logo p { font-size:0.7rem; color:var(--text-muted); margin-top:2px; }
 
-<!-- ========== MAIN ========== -->
-<div class="main" id="mainContent">
+        .sidebar-menu { padding:15px 12px; flex:1; }
+        .menu-label {
+            font-size:0.65rem; color:var(--text-dim);
+            text-transform:uppercase; letter-spacing:2px;
+            padding:10px 10px 6px; font-weight:700;
+        }
+        .menu-item {
+            display:flex; align-items:center; gap:12px;
+            padding:11px 14px; border-radius:var(--radius-sm);
+            cursor:pointer; transition:var(--transition);
+            margin-bottom:3px; font-size:0.9rem;
+            color:var(--text-muted); user-select:none; position:relative;
+        }
+        .menu-item:hover { background:var(--glass2); color:var(--text); transform:translateX(3px); }
+        .menu-item.active {
+            background:linear-gradient(135deg,var(--primary-light),rgba(255,101,132,0.08));
+            color:var(--primary); border:1px solid rgba(108,99,255,0.2); font-weight:600;
+        }
+        .menu-item.active::before {
+            content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+            width:3px; height:60%; background:var(--primary); border-radius:0 3px 3px 0;
+        }
+        .menu-item .icon { font-size:1rem; width:22px; text-align:center; flex-shrink:0; }
+        .sidebar-footer { padding:15px 20px; border-top:1px solid var(--border); font-size:0.75rem; color:var(--text-muted); }
 
-    <!-- TOPBAR -->
-    <header class="topbar">
-        <div class="topbar-left">
-            <button class="btn-hamburger" id="hamburgerBtn">☰</button>
-            <div>
-                <h1 id="pageTitle">ড্যাশবোর্ড</h1>
-                <p id="pageSubtitle">সকল পাওনার সারসংক্ষেপ</p>
-            </div>
-        </div>
-        <div class="topbar-right">
-            <div class="search-box">
-                <span>🔍</span>
-                <input type="text" id="globalSearch" placeholder="নাম বা নম্বর খুঁজুন...">
-            </div>
-            <button class="btn-primary" id="quickAddBtn">
-                ➕ নতুন যোগ
-            </button>
-        </div>
-    </header>
+        /* ===== MAIN ===== */
+        .main { margin-left:var(--sidebar-width); min-height:100vh; display:flex; flex-direction:column; }
 
-    <!-- CONTENT PAGES -->
-    <div class="content">
+        /* ===== TOPBAR ===== */
+        .topbar {
+            position:sticky; top:0; z-index:100;
+            height:65px;
+            background:rgba(22,33,62,0.97);
+            backdrop-filter:blur(20px);
+            border-bottom:1px solid var(--border);
+            padding:0 25px;
+            display:flex; align-items:center; justify-content:space-between; gap:20px;
+        }
+        .topbar-left { display:flex; align-items:center; gap:15px; }
+        .topbar-left h1 { font-size:1.2rem; font-weight:700; line-height:1.2; }
+        .topbar-left p { font-size:0.75rem; color:var(--text-muted); }
+        .topbar-right { display:flex; align-items:center; gap:12px; }
 
-        <!-- ===== DASHBOARD ===== -->
-        <div class="page active" id="page-dashboard">
+        .btn-hamburger {
+            display:none;
+            background:var(--glass2); border:1px solid var(--border2);
+            color:var(--text); width:38px; height:38px;
+            border-radius:var(--radius-sm); font-size:1.1rem; cursor:pointer;
+            transition:var(--transition); align-items:center; justify-content:center;
+        }
+        .btn-hamburger:hover { background:var(--primary-light); }
 
-            <div class="stats-grid" id="statsGrid"></div>
+        .search-box {
+            display:flex; align-items:center; gap:10px;
+            background:var(--glass2); border:1px solid var(--border2);
+            border-radius:var(--radius-sm); padding:8px 14px; transition:var(--transition);
+        }
+        .search-box:focus-within { border-color:var(--primary); }
+        .search-box input {
+            background:none; border:none; outline:none;
+            color:var(--text); font-family:inherit; font-size:0.88rem; width:200px;
+        }
+        .search-box input::placeholder { color:var(--text-muted); }
 
-            <div class="dashboard-grid">
-                <div>
-                    <div class="section-header">
-                        <span class="section-title">🔥 সর্বোচ্চ পাওনাদার</span>
-                        <button class="btn-link" onclick="showPage('customers')">সব দেখুন →</button>
-                    </div>
-                    <div class="table-card">
-                        <div class="table-wrapper">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>নাম</th>
-                                        <th>পাওনা</th>
-                                        <th>বাকি</th>
-                                        <th>অবস্থা</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dashTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color:white; border:none; border-radius:var(--radius-sm);
+            padding:10px 18px; font-family:inherit; font-size:0.88rem;
+            font-weight:600; cursor:pointer; transition:var(--transition);
+            display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+        }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(108,99,255,0.4); }
 
-                <div>
-                    <div class="section-header">
-                        <span class="section-title">🕐 সাম্প্রতিক লেনদেন</span>
-                        <button class="btn-link" onclick="showPage('history')">সব দেখুন →</button>
-                    </div>
-                    <div class="recent-list" id="recentList"></div>
+        .btn-secondary {
+            background:var(--glass2); color:var(--text-muted);
+            border:1px solid var(--border2); border-radius:var(--radius-sm);
+            padding:10px 18px; font-family:inherit; font-size:0.88rem;
+            font-weight:600; cursor:pointer; transition:var(--transition);
+        }
+        .btn-secondary:hover { color:var(--text); background:var(--glass); }
 
-                    <div class="section-header" style="margin-top:25px;">
-                        <span class="section-title">📝 সক্রিয় নোট</span>
-                        <button class="btn-link" onclick="showPage('notes')">সব দেখুন →</button>
-                    </div>
-                    <div id="dashNotes"></div>
-                </div>
-            </div>
-        </div>
+        .btn-danger-sm {
+            background:var(--danger-light); color:var(--danger);
+            border:1px solid rgba(255,92,92,0.2); border-radius:var(--radius-sm);
+            padding:8px 15px; font-family:inherit; font-size:0.82rem;
+            font-weight:600; cursor:pointer; transition:var(--transition);
+        }
+        .btn-danger-sm:hover { background:var(--danger); color:white; }
 
-        <!-- ===== CUSTOMERS ===== -->
-        <div class="page" id="page-customers">
+        .btn-link {
+            background:none; border:none; color:var(--primary);
+            font-family:inherit; font-size:0.82rem; cursor:pointer;
+            transition:var(--transition); padding:4px 8px; border-radius:6px;
+        }
+        .btn-link:hover { background:var(--primary-light); }
 
-            <div class="form-card" id="addCustomerForm">
-                <div class="form-card-header" id="formToggle">
-                    <h3>➕ নতুন পাওনাদার যোগ করুন</h3>
-                    <span class="toggle-icon">▲</span>
-                </div>
-                <div class="form-body" id="formBody">
-                    <div class="form-grid-4">
-                        <div class="form-group">
-                            <label>👤 নাম *</label>
-                            <input type="text" class="form-input" id="newName" placeholder="পাওনাদারের নাম">
-                        </div>
-                        <div class="form-group">
-                            <label>📞 ফোন *</label>
-                            <input type="text" class="form-input" id="newPhone" placeholder="01XXXXXXXXX">
-                        </div>
-                        <div class="form-group">
-                            <label>💵 পাওনার পরিমাণ *</label>
-                            <input type="number" class="form-input" id="newAmount" placeholder="০.০০">
-                        </div>
-                        <div class="form-group">
-                            <label>📅 তারিখ</label>
-                            <input type="date" class="form-input" id="newDate">
-                        </div>
-                    </div>
-                    <div class="form-group" style="margin-top:12px;">
-                        <label>📌 বিবরণ (ঐচ্ছিক)</label>
-                        <input type="text" class="form-input" id="newDesc" placeholder="কোন কাজের জন্য পাওনা...">
-                    </div>
-                    <div style="margin-top:15px;display:flex;gap:10px;">
-                        <button class="btn-primary" onclick="addCustomer()">➕ যোগ করুন</button>
-                        <button class="btn-secondary" onclick="clearForm()">🔄 পরিষ্কার</button>
-                    </div>
-                </div>
-            </div>
+        /* ===== CONTENT ===== */
+        .content { padding:25px; flex:1; }
+        .page { display:none; }
+        .page.active { display:block; animation:fadeIn 0.3s ease; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-            <div class="section-header">
-                <span class="section-title">📃 পাওনাদারদের তালিকা</span>
-                <div style="display:flex;gap:10px;align-items:center;">
-                    <span class="count-badge" id="customerCount">০ জন</span>
-                    <div class="sort-select-wrap">
-                        <select id="sortSelect" class="sort-select" onchange="renderCustomers()">
-                            <option value="name">নাম অনুযায়ী</option>
-                            <option value="debt-high">সর্বোচ্চ পাওনা</option>
-                            <option value="debt-low">সর্বনিম্ন পাওনা</option>
-                            <option value="remain-high">সর্বোচ্চ বাকি</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="filter-tabs" id="customerFilterTabs">
-                <button class="filter-tab active" data-filter="all">সকল</button>
-                <button class="filter-tab" data-filter="unpaid">পরিশোধ হয়নি</button>
-                <button class="filter-tab" data-filter="partial">আংশিক পরিশোধ</button>
-                <button class="filter-tab" data-filter="done">সম্পূর্ণ পরিশোধ</button>
-                <button class="filter-tab" data-filter="zero">শূন্য পাওনা</button>
-            </div>
-
-            <div class="table-card">
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>নাম ও ফোন</th>
-                                <th>বিবরণ</th>
-                                <th>মোট পাওনা</th>
-                                <th>পরিশোধ</th>
-                                <th>বাকি</th>
-                                <th>অগ্রগতি</th>
-                                <th>অবস্থা</th>
-                                <th>অ্যাকশন</th>
-                            </tr>
-                        </thead>
-                        <tbody id="customerTableBody"></tbody>
-                    </table>
-                    <div class="empty-state" id="custEmpty" style="display:none;">
-                        <div class="empty-icon">📭</div>
-                        <p>কোনো পাওনাদার পাওয়া যায়নি</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== NOTES ===== -->
-        <div class="page" id="page-notes">
-            <div class="section-header">
-                <span class="section-title">📝 নোট ও রিমাইন্ডার</span>
-                <button class="btn-primary" onclick="openNoteModal()">➕ নতুন নোট</button>
-            </div>
-
-            <div class="filter-tabs" id="noteFilterTabs">
-                <button class="filter-tab active" data-filter="all">সকল</button>
-                <button class="filter-tab" data-filter="overdue">মেয়াদ উত্তীর্ণ</button>
-                <button class="filter-tab" data-filter="soon">শীঘ্রই শেষ</button>
-                <button class="filter-tab" data-filter="no-deadline">কোনো তারিখ নেই</button>
-            </div>
-
-            <div class="notes-grid" id="notesGrid"></div>
-            <div class="empty-state" id="notesEmpty" style="display:none;">
-                <div class="empty-icon">🗒️</div>
-                <p>কোনো নোট নেই। নতুন নোট যোগ করুন!</p>
-            </div>
-        </div>
-
-        <!-- ===== HISTORY ===== -->
-        <div class="page" id="page-history">
-            <div class="section-header">
-                <span class="section-title">📋 পরিশোধের ইতিহাস</span>
-                <div style="display:flex;gap:10px;">
-                    <button class="btn-secondary" onclick="exportHistory()">📥 এক্সপোর্ট</button>
-                    <button class="btn-danger-sm" onclick="clearHistory()">🗑️ সব মুছুন</button>
-                </div>
-            </div>
-
-            <div class="history-stats" id="historyStats"></div>
-            <div class="history-list" id="historyList"></div>
-            <div class="empty-state" id="historyEmpty" style="display:none;">
-                <div class="empty-icon">📋</div>
-                <p>কোনো পরিশোধের রেকর্ড নেই</p>
-            </div>
-        </div>
-
-        <!-- ===== REPORTS ===== -->
-        <div class="page" id="page-reports">
-            <div class="section-header">
-                <span class="section-title">📈 রিপোর্ট ও বিশ্লেষণ</span>
-                <button class="btn-primary" onclick="printReport()">🖨️ প্রিন্ট করুন</button>
-            </div>
-            <div id="reportsContent"></div>
-        </div>
-
-        <!-- ===== SETTINGS ===== -->
-        <div class="page" id="page-settings">
-            <div class="section-header">
-                <span class="section-title">⚙️ সেটিংস</span>
-            </div>
-            <div id="settingsContent"></div>
-        </div>
-
-    </div>
-</div>
-
-<!-- ========== PAY MODAL ========== -->
-<div class="modal-overlay" id="payModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3>💳 পরিশোধ গ্রহণ</h3>
-            <button class="modal-close" data-close="payModal">✕</button>
-        </div>
-        <div class="modal-info" id="payInfo"></div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label>পরিশোধের পরিমাণ (টাকা) *</label>
-                <input type="number" class="form-input" id="payAmountInput" placeholder="কত টাকা?">
-            </div>
-            <div class="form-group">
-                <label>পরিশোধের তারিখ</label>
-                <input type="date" class="form-input" id="payDateInput">
-            </div>
-            <div class="form-group">
-                <label>নোট (ঐচ্ছিক)</label>
-                <input type="text" class="form-input" id="payNoteInput" placeholder="কোনো মন্তব্য...">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" data-close="payModal">বাতিল</button>
-            <button class="btn-confirm" onclick="confirmPayment()">✅ পরিশোধ নিশ্চিত করুন</button>
-        </div>
-    </div>
-</div>
-
-<!-- ========== NOTE MODAL ========== -->
-<div class="modal-overlay" id="noteModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3 id="noteModalTitle">📝 নতুন নোট</h3>
-            <button class="modal-close" data-close="noteModal">✕</button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label>সম্পর্কিত পাওনাদার</label>
-                <select class="form-input" id="noteCustomer"></select>
-            </div>
-            <div class="form-group">
-                <label>শিরোনাম *</label>
-                <input type="text" class="form-input" id="noteTitle" placeholder="নোটের শিরোনাম...">
-            </div>
-            <div class="form-group">
-                <label>বিস্তারিত</label>
-                <textarea class="form-input" id="noteText" placeholder="বিস্তারিত লিখুন..."></textarea>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>পরিশোধের সময়সীমা</label>
-                    <input type="date" class="form-input" id="noteDeadline">
-                </div>
-                <div class="form-group">
-                    <label>অগ্রাধিকার</label>
-                    <select class="form-input" id="notePriority">
-                        <option value="normal">সাধারণ</option>
-                        <option value="high">জরুরি</option>
-                        <option value="low">কম গুরুত্বপূর্ণ</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>রঙ</label>
-                <div class="color-options" id="colorOptions">
-                    <div class="color-option selected" data-color="#6C63FF" style="background:#6C63FF;"></div>
-                    <div class="color-option" data-color="#FF6584" style="background:#FF6584;"></div>
-                    <div class="color-option" data-color="#00C896" style="background:#00C896;"></div>
-                    <div class="color-option" data-color="#FFB830" style="background:#FFB830;"></div>
-                    <div class="color-option" data-color="#FF5C5C" style="background:#FF5C5C;"></div>
-                    <div class="color-option" data-color="#00BCD4" style="background:#00BCD4;"></div>
-                    <div class="color-option" data-color="#E91E63" style="background:#E91E63;"></div>
-                    <div class="color-option" data-color="#4CAF50" style="background:#4CAF50;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" data-close="noteModal">বাতিল</button>
-            <button class="btn-confirm" onclick="saveNote()">💾 সংরক্ষণ করুন</button>
-        </div>
-    </div>
-</div>
-
-<!-- ========== QUICK ADD MODAL ========== -->
-<div class="modal-overlay" id="quickAddModal">
-    <div class="modal modal-sm">
-        <div class="modal-header">
-            <h3>⚡ দ্রুত যোগ করুন</h3>
-            <button class="modal-close" data-close="quickAddModal">✕</button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label>👤 নাম *</label>
-                <input type="text" class="form-input" id="qName" placeholder="পাওনাদারের নাম">
-            </div>
-            <div class="form-group">
-                <label>📞 ফোন *</label>
-                <input type="text" class="form-input" id="qPhone" placeholder="01XXXXXXXXX">
-            </div>
-            <div class="form-group">
-                <label>💵 পরিমাণ *</label>
-                <input type="number" class="form-input" id="qAmount" placeholder="০.০০">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" data-close="quickAddModal">বাতিল</button>
-            <button class="btn-confirm" onclick="quickAdd()">➕ যোগ করুন</button>
-        </div>
-    </div>
-</div>
-
-<!-- ========== CUSTOMER DETAIL MODAL ========== -->
-<div class="modal-overlay" id="detailModal">
-    <div class="modal modal-lg">
-        <div class="modal-header">
-            <h3 id="detailModalTitle">👤 পাওনাদারের বিস্তারিত</h3>
-            <button class="modal-close" data-close="detailModal">✕</button>
-        </div>
-        <div id="detailContent"></div>
-    </div>
-</div>
-
-<!-- ========== TOAST ========== -->
-<div class="toast-container" id="toastContainer"></div>
-
-<!-- ========== SCRIPTS ========== -->
-<script src="assets/js/data.js"></script>
-<script src="assets/js/customers.js"></script>
-<script src="assets/js/notes.js"></script>
-<script src="assets/js/history.js"></script>
-<script src="assets/js/app.js"></script>
-</body>
-</html>
+        /* ===== STAT CARDS ===== */
+        .stats-grid {
+            display:grid; grid-template-columns:repeat(4,1fr);
+            gap:18px; margin-bottom:28px;
+        }
+        .stat-card {
+            background:var(--card); border:1px solid var(--border);
+            border-radius:var(--radius); padding:22px;
+            position:relative; overflow:hidden; transition:var(--transition);
+        }
+        .stat-card:hover { transform:translateY(-4px); box-shadow:var(--shadow); }
+        .stat-card::after {
+            content:''; position:absolute; bottom:-20px; right:-20px;
+            width:80px; height:80px; border-radius:50%; opacity:0.08;
+        }
+        
